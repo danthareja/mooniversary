@@ -4,7 +4,12 @@ import Draggable from "react-draggable";
 
 const MoonContext = React.createContext();
 
-export function MoonSliderProvider({ size = 100, onComplete, children }) {
+export function MoonSliderProvider({
+  size = 100,
+  duration = 1000,
+  onComplete,
+  children,
+}) {
   const [basket, setBasket] = React.useState({
     bottom: 0,
     height: 0,
@@ -31,6 +36,7 @@ export function MoonSliderProvider({ size = 100, onComplete, children }) {
 
   const value = {
     size,
+    duration,
     basket,
     setBasket,
     ball,
@@ -60,7 +66,8 @@ export function MoonSliderBall({ threshold = 25, className }) {
     throw new Error("MoonSliderBall must be used within a MoonSliderProvider");
   }
 
-  const { basket, ball, setBall, isComplete, complete, size } = context;
+  const { size, duration, basket, ball, setBall, isComplete, complete } =
+    context;
   const ballRef = React.useRef(null);
   const [position, setPosition] = React.useState({ x: 0, y: 0 });
 
@@ -107,7 +114,7 @@ export function MoonSliderBall({ threshold = 25, className }) {
           width: `${size}px`,
           cursor: isComplete ? "default" : "pointer",
           opacity: isComplete ? 0 : 1,
-          transition: "opacity 250ms",
+          transition: `opacity ${duration}ms`,
         }}
       >
         <Image
@@ -130,7 +137,7 @@ export function MoonSliderBasket({ className }) {
     );
   }
 
-  const { size, setBasket, isComplete } = context;
+  const { size, duration, setBasket, isComplete } = context;
   const basketRef = React.useRef(null);
 
   // Initialize basket location
@@ -149,7 +156,7 @@ export function MoonSliderBasket({ className }) {
         borderRadius: `${size}px`,
         border: `4px dashed rgba(255, 255, 255, 0.9)`,
         opacity: isComplete ? 0 : 1,
-        transition: `opacity 250ms`,
+        transition: `opacity ${duration}ms`,
       }}
     ></div>
   );
