@@ -8,16 +8,6 @@
   height: 100vh;
 }
 
-.ball {
-  /* position: absolute; */
-}
-
-.basket {
-  position: absolute;
-  top: 50px;
-  right: 50px;
-}
-
 .main {
   padding: 5rem 0;
   flex: 1;

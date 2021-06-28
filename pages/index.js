@@ -1,11 +1,15 @@
 import React from "react";
 import Head from "next/head";
-import Image from "next/image";
 import styles from "@/styles/Home.module.css";
 
 import { format } from "date-fns";
 import { Moon, LunarPhase } from "@/lib/moon";
-import { MoonSliderBall, MoonSliderBasket, useMoonSlider } from "@/components";
+import {
+  Background,
+  MoonSliderBall,
+  MoonSliderBasket,
+  useMoonSlider,
+} from "@/components";
 
 export default function Home({ nextFullMoon }) {
   const { isComplete } = useMoonSlider();
@@ -17,16 +21,7 @@ export default function Home({ nextFullMoon }) {
         <meta name="description" content="Mooniversary tracking app" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className={styles.background}>
-        <Image
-          alt="Night sky"
-          src="/sky.jpg"
-          layout="fill"
-          objectFit="cover"
-          quality={100}
-          draggable="false"
-        />
-      </div>
+      <Background />
       <MoonSliderBasket className={styles.basket} />
       <div className={styles.container}>
         <main className={styles.main}>
