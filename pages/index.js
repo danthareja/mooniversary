@@ -1,9 +1,11 @@
+import React from "react";
 import Head from "next/head";
 import Image from "next/image";
 import styles from "@/styles/Home.module.css";
 
-import { Moon, LunarPhase } from "@/lib/moon";
 import { format } from "date-fns";
+import { Moon, LunarPhase } from "@/lib/moon";
+import { MoonSliderBall, MoonSliderBasket, useMoonSlider } from "@/components";
 
 export default function Home() {
   const nextFullMoon = format(
@@ -11,8 +13,10 @@ export default function Home() {
     "yyyy/MM/dd"
   );
 
+  const { isComplete } = useMoonSlider();
+
   return (
-    <div>
+    <React.Fragment>
       <Head>
         <title>Mooniversary</title>
         <meta name="description" content="Mooniversary tracking app" />
@@ -20,19 +24,47 @@ export default function Home() {
       </Head>
       <div className={styles.background}>
         <Image
-          alt="Background image"
-          src="/background.jpg"
+          alt="Night sky"
+          src="/sky.jpg"
           layout="fill"
           objectFit="cover"
           quality={100}
+          draggable="false"
         />
       </div>
+      <MoonSliderBasket className={styles.basket} />
       <div className={styles.container}>
         <main className={styles.main}>
-          <h1 className={styles.title}>{nextFullMoon}</h1>
-          <p className={styles.description}>is our next Mooniversary</p>
+          <h1
+            className={styles.title}
+            style={{
+              opacity: isComplete ? 1 : 0,
+              transition: "opacity 1000ms",
+            }}
+          >
+            {nextFullMoon}
+          </h1>
+          <p
+            className={styles.description}
+            style={{
+              opacity: isComplete ? 1 : 0,
+              transition: "opacity 1000ms",
+            }}
+          >
+            is our next Mooniversary
+          </p>
+          <MoonSliderBall className={styles.ball} />
+          <p
+            className={styles.description}
+            style={{
+              opacity: isComplete ? 0 : 1,
+              transition: "opacity 1000ms",
+            }}
+          >
+            Drag the moon into the sky to see the date of our next Mooniversary
+          </p>
         </main>
       </div>
-    </div>
+    </React.Fragment>
   );
 }
