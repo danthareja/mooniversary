@@ -1,15 +1,26 @@
 import React from "react";
+import PropTypes from "prop-types";
+import { formatISO } from "date-fns";
 import { useUser } from "@auth0/nextjs-auth0";
 import styles from "./EventInput.module.css";
 
-export function EventInput() {
+export function EventInput({ summary, date }) {
   const { user, error, isLoading } = useUser();
   console.log("user", user, "error", error, "isLoadgin", isLoading);
 
   React.useEffect(() => {
-    fetch("/api/event")
+    fetch("/api/event", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        summary,
+        date: formatISO(date, { representation: "date" }),
+      }),
+    })
       .then((res) => res.json())
-      .then((d) => console.log("d", d));
+      .then((d) => console.log(d));
   }, []);
 
   return (
@@ -24,3 +35,7 @@ export function EventInput() {
     </div>
   );
 }
+
+EventInput.propTypes = {
+  date: PropTypes.instanceOf(Date).isRequired,
+};
