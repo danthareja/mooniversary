@@ -2,6 +2,23 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ## Getting Started
 
+Create an Auth0 application and add the variables to a new `.env.local` file in the root directory
+
+```
+# A long, secret value used to encrypt the session cookie
+AUTH0_SECRET=LONG_RANDOM_VALUE
+# The base url of your application
+AUTH0_BASE_URL=http://localhost:3000
+# The url of your Auth0 tenant domain
+AUTH0_ISSUER_BASE_URL=https://YOUR_AUTH0_DOMAIN.auth0.com
+# Your Auth0 applications Client ID
+AUTH0_CLIENT_ID=YOUR_AUTH0_CLIENT_ID
+# Your Auth0 application's Client Secret
+AUTH0_CLIENT_SECRET=YOUR_AUTH0_CLIENT_SECRET
+```
+
+> See [docs](https://github.com/auth0/nextjs-auth0) to learn about Auth0 with Next.js
+
 Then, run the development server:
 
 ```bash
