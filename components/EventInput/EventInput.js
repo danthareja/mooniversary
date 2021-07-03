@@ -4,7 +4,7 @@ import { formatISO } from "date-fns";
 import { useUser } from "@auth0/nextjs-auth0";
 import styles from "./EventInput.module.css";
 
-export function EventInput({ summary, date }) {
+export function EventInput({ title, date }) {
   const { user, error, isLoading } = useUser();
   console.log("user", user, "error", error, "isLoadgin", isLoading);
 
@@ -15,7 +15,8 @@ export function EventInput({ summary, date }) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        summary,
+        title,
+        description: "do some cool stuff",
         date: formatISO(date, { representation: "date" }),
       }),
     })

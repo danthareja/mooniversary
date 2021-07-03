@@ -3,6 +3,31 @@ import { parseISO, formatISO, add } from "date-fns";
 import { withApiAuthRequired } from "@auth0/nextjs-auth0";
 import { getIdPToken } from "@/lib/server";
 
+const createExtendedProperty = (body) => {
+  return [["mooniversary", `${body.title}:${body.date}`]];
+};
+
+const createEventResource = (body) => {
+  const startDate = body.date;
+  const endDate = formatISO(add(parseISO(startDate), { days: 1 }), {
+    representation: "date",
+  });
+
+  return {
+    summary: body.title,
+    description: `- ${body.description}`,
+    start: {
+      date: startDate,
+    },
+    end: {
+      date: endDate,
+    },
+    extendedProperties: {
+      shared: Object.fromEntries(createExtendedProperty(body)),
+    },
+  };
+};
+
 export default withApiAuthRequired(async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({
@@ -14,14 +39,21 @@ export default withApiAuthRequired(async function handler(req, res) {
   if (!req.body.date) {
     return res.status(400).json({
       error: "invalid_params",
-      description: "Invalid parameters. Expected date string as YYYY-MM-DD",
+      description: "Invalid parameters. Expected 'date' string as YYYY-MM-DD",
     });
   }
 
-  if (!req.body.summary) {
+  if (!req.body.title) {
     return res.status(400).json({
       error: "invalid_params",
-      description: "Invalid parameters. Expected summary string",
+      description: "Invalid parameters. Expected 'title' string",
+    });
+  }
+
+  if (!req.body.description) {
+    return res.status(400).json({
+      error: "invalid_params",
+      description: "Invalid parameters. Expected 'description' string",
     });
   }
 
@@ -33,23 +65,38 @@ export default withApiAuthRequired(async function handler(req, res) {
     },
   });
 
-  const startDate = req.body.date;
-  const endDate = formatISO(add(parseISO(startDate), { days: 1 }), {
-    representation: "date",
+  const eventsList = await calendar.events.list({
+    calendarId: "primary",
+    // a sharedExtendedProperty is only defined programmatically
+    // and will allow us to search for events that may have been renamed
+    sharedExtendedProperty: createExtendedProperty(req.body)
+      .map(([key, value]) => `${key}=${value}`)
+      .join(","),
   });
 
-  await calendar.events.insert({
-    calendarId: "primary",
-    resource: {
-      summary: req.body.summary,
-      start: {
-        date: startDate,
+  const event = eventsList?.data.items[0];
+
+  if (event) {
+    console.log(`updating existing event ${event.summary}`);
+    await calendar.events.update({
+      calendarId: "primary",
+      eventId: event.id,
+      resource: {
+        ...createEventResource(req.body),
+        // The description may have been tampered with since creation
+        // If it has been deleted, we should create the same description as the first time
+        description: event.description
+          ? event.description.concat(`\n- ${req.body.description}`)
+          : `- ${req.body.description}`,
       },
-      end: {
-        date: endDate,
-      },
-    },
-  });
+    });
+  } else {
+    console.log("creating new event");
+    await calendar.events.insert({
+      calendarId: "primary",
+      resource: createEventResource(req.body),
+    });
+  }
 
   return res.status(201).json({
     success: true,

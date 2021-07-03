@@ -15,7 +15,7 @@ export default function Home({ nextFullMoon, emoji }) {
           <h1 className={styles.title}>{nextFullMoon}</h1>
           <p className={styles.description}>is our next Mooniversary</p>
           <EventInput
-            summary={`Full Moooooon ${emoji}`}
+            title={`Mooniversary <3`}
             date={parse(nextFullMoon, DATE_FORMAT, new Date())}
           />
         </main>
