@@ -1,6 +1,6 @@
 import { google } from "googleapis";
 import { parseISO, formatISO, add } from "date-fns";
-import { withApiAuthRequired } from "@auth0/nextjs-auth0";
+import { withApiAuthRequired, handleLogout } from "@auth0/nextjs-auth0";
 import { getIdPToken } from "@/lib/auth";
 
 const createExtendedProperty = (body) => {
@@ -14,8 +14,11 @@ const createEventResource = (body) => {
   });
 
   return {
-    summary: body.title,
-    description: `- ${body.description}`,
+    summary: `${body.title}: ${body.description}`,
+    attendees: [
+      { email: "danthareja@gmail.com" },
+      { email: "fattymcrolls@gmail.com" },
+    ],
     start: {
       date: startDate,
     },
@@ -65,38 +68,40 @@ export default withApiAuthRequired(async function handler(req, res) {
     },
   });
 
-  const eventsList = await calendar.events.list({
+  // DT: Uncomment to edit code instead of add a new event every time
+  //
+  // const eventsList = await calendar.events.list({
+  //   calendarId: "primary",
+  //   // a sharedExtendedProperty is only defined programmatically
+  //   // and will allow us to search for events that may have been renamed
+  //   sharedExtendedProperty: createExtendedProperty(req.body)
+  //     .map(([key, value]) => `${key}=${value}`)
+  //     .join(","),
+  // });
+
+  // const event = eventsList?.data.items[0];
+
+  // if (event) {
+  //   console.log(`updating existing event ${event.summary}`);
+  //   await calendar.events.update({
+  //     calendarId: "primary",
+  //     eventId: event.id,
+  //     resource: {
+  //       ...createEventResource(req.body),
+  //       // The description may have been tampered with since creation
+  //       // If it has been deleted, we should create the same description as the first time
+  //       description: event.description
+  //         ? event.description.concat(`\n- ${req.body.description}`)
+  //         : `- ${req.body.description}`,
+  //     },
+  //   });
+  // } else {
+  console.log("creating new event");
+  await calendar.events.insert({
     calendarId: "primary",
-    // a sharedExtendedProperty is only defined programmatically
-    // and will allow us to search for events that may have been renamed
-    sharedExtendedProperty: createExtendedProperty(req.body)
-      .map(([key, value]) => `${key}=${value}`)
-      .join(","),
+    resource: createEventResource(req.body),
   });
-
-  const event = eventsList?.data.items[0];
-
-  if (event) {
-    console.log(`updating existing event ${event.summary}`);
-    await calendar.events.update({
-      calendarId: "primary",
-      eventId: event.id,
-      resource: {
-        ...createEventResource(req.body),
-        // The description may have been tampered with since creation
-        // If it has been deleted, we should create the same description as the first time
-        description: event.description
-          ? event.description.concat(`\n- ${req.body.description}`)
-          : `- ${req.body.description}`,
-      },
-    });
-  } else {
-    console.log("creating new event");
-    await calendar.events.insert({
-      calendarId: "primary",
-      resource: createEventResource(req.body),
-    });
-  }
+  // }
 
   return res.status(201).json({
     success: true,
