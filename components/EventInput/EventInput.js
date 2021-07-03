@@ -1,11 +1,16 @@
 import React from "react";
-import Link from "next/link";
 import { useUser } from "@auth0/nextjs-auth0";
 import styles from "./EventInput.module.css";
 
 export function EventInput() {
   const { user, error, isLoading } = useUser();
   console.log("user", user, "error", error, "isLoadgin", isLoading);
+
+  React.useEffect(() => {
+    fetch("/api/event")
+      .then((res) => res.json())
+      .then((d) => console.log("d", d));
+  }, []);
 
   return (
     <div className={styles.root}>
