@@ -1,7 +1,7 @@
 import { google } from "googleapis";
 import { parseISO, formatISO, add } from "date-fns";
 import { withApiAuthRequired } from "@auth0/nextjs-auth0";
-import { getIdPToken } from "@/lib/server";
+import { getIdPToken } from "@/lib/auth";
 
 const createExtendedProperty = (body) => {
   return [["mooniversary", `${body.title}:${body.date}`]];
