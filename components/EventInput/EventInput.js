@@ -6,7 +6,10 @@ import { useForm } from "react-hook-form";
 import styles from "./EventInput.module.css";
 
 export function EventInput({ title = "<3 Mooniversary", date }) {
-  const { user, error, isLoading } = useUser();
+  // Auth state
+  const { user } = useUser();
+
+  // Form state
   const {
     register,
     handleSubmit,
@@ -18,7 +21,7 @@ export function EventInput({ title = "<3 Mooniversary", date }) {
     },
   });
 
-  const onSubmit = async ({ description }, e) => {
+  const onSubmit = async ({ description }) => {
     await fetch("/api/event", {
       method: "POST",
       headers: {
@@ -38,29 +41,39 @@ export function EventInput({ title = "<3 Mooniversary", date }) {
     }
   }, [isSubmitSuccessful, reset]);
 
-  console.log(
-    "isSubmitting",
-    isSubmitting,
-    "isSubmitSuccessful",
-    isSubmitSuccessful
-  );
+  console.log("errors", errors, "isSubmitSuccessful", isSubmitSuccessful);
+
+  if (!user) {
+    return (
+      // eslint-disable-next-line @next/next/no-html-link-for-pages
+      <a className={styles.login} href="/api/auth/login">
+        Login to add an event
+      </a>
+    );
+  }
 
   return (
-    <div className={styles.root}>
-      {user ? (
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <input
-            {...register("description", { required: true })}
-            disabled={isSubmitting}
-          />
-          {errors.description && <p>Last name is required.</p>}
-          <input type="submit" disabled={isSubmitting} />
-        </form>
-      ) : (
-        // eslint-disable-next-line @next/next/no-html-link-for-pages
-        <a href="/api/auth/login">Click to Login (requires refresh)</a>
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <label htmlFor="EventInput__description" className={styles.label}>
+        What should we do?
+      </label>
+      <input
+        id="EventInput__description"
+        {...register("description", { required: true })}
+        disabled={isSubmitting}
+        placeholder="Something crazy"
+        className={styles.input}
+      />
+      <input
+        type="submit"
+        value={isSubmitting ? "Booking..." : "Book it"}
+        disabled={isSubmitting}
+        className={`${styles.input} ${styles.submit}`}
+      />
+      {errors.description && (
+        <div className={styles.error}>We can&apos;t do nothing</div>
       )}
-    </div>
+    </form>
   );
 }
 
