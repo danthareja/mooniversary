@@ -27,8 +27,12 @@
   cursor: default;
 }
 
-.submit {
+.inputSubmit {
   cursor: pointer;
+}
+
+.inputError {
+  border: 2px solid orange;
 }
 
 .error {

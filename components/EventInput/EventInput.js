@@ -1,28 +1,29 @@
 import React from "react";
 import PropTypes from "prop-types";
+import Link from "next/link";
+import { useRouter } from "next/router";
 import { formatISO } from "date-fns";
 import { useUser } from "@auth0/nextjs-auth0";
 import { useForm } from "react-hook-form";
 import styles from "./EventInput.module.css";
-
 export function EventInput({ title = "<3 Mooniversary", date }) {
-  // Auth state
+  const router = useRouter();
   const { user } = useUser();
-
-  // Form state
   const {
     register,
     handleSubmit,
+    setError,
     reset,
     formState: { errors, isSubmitting, isSubmitSuccessful },
   } = useForm({
     defaultValues: {
       description: "",
     },
+    reValidateMode: "onBlur",
   });
 
   const onSubmit = async ({ description }) => {
-    await fetch("/api/event", {
+    const response = await fetch("/api/event", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -33,8 +34,28 @@ export function EventInput({ title = "<3 Mooniversary", date }) {
         date: formatISO(date, { representation: "date" }),
       }),
     });
+
+    if (!response.ok) {
+      const data = await response.json();
+      // sometimes a a user's Auth0 session is still valid
+      // but their google accessToken has expired
+      // forcing a re-login will correct this issue
+      if (data?.error === "token_expired") {
+        router.replace(
+          `/api/auth/logout?returnTo=/api/auth/login?returnTo=/event`
+        );
+      } else {
+        console.error(response);
+        console.error(data);
+        setError("description", {
+          type: "server",
+          message: "Try again later",
+        });
+      }
+    }
   };
 
+  // reset form after async submission
   React.useEffect(() => {
     if (isSubmitSuccessful) {
       reset();
@@ -45,34 +66,33 @@ export function EventInput({ title = "<3 Mooniversary", date }) {
 
   if (!user) {
     return (
-      // eslint-disable-next-line @next/next/no-html-link-for-pages
-      <a className={styles.login} href="/api/auth/login">
-        Login to add an event
-      </a>
+      <Link href={`/api/auth/login?returnTo=/event`} passHref>
+        <a className={styles.login}>Login to add an event</a>
+      </Link>
     );
   }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <label htmlFor="EventInput__description" className={styles.label}>
-        What should we do?
-      </label>
       <input
-        id="EventInput__description"
         {...register("description", { required: true })}
+        autoComplete="off"
         disabled={isSubmitting}
-        placeholder="Something crazy"
-        className={styles.input}
+        placeholder={
+          errors?.description?.type === "required"
+            ? "Write here first"
+            : "What should we do?"
+        }
+        className={`${styles.input} ${
+          errors?.description?.type === "required" ? styles.inputError : ""
+        }`}
       />
       <input
         type="submit"
-        value={isSubmitting ? "Booking..." : "Book it"}
+        value={isSubmitting ? "Sending..." : "Send it"}
         disabled={isSubmitting}
-        className={`${styles.input} ${styles.submit}`}
+        className={`${styles.input} ${styles.inputSubmit}`}
       />
-      {errors.description && (
-        <div className={styles.error}>We can&apos;t do nothing</div>
-      )}
     </form>
   );
 }

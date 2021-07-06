@@ -78,9 +78,9 @@ export default withApiAuthRequired(async function handler(req, res) {
   //     .map(([key, value]) => `${key}=${value}`)
   //     .join(","),
   // });
-
+  //
   // const event = eventsList?.data.items[0];
-
+  //
   // if (event) {
   //   console.log(`updating existing event ${event.summary}`);
   //   await calendar.events.update({
@@ -96,12 +96,34 @@ export default withApiAuthRequired(async function handler(req, res) {
   //     },
   //   });
   // } else {
-  console.log("creating new event");
-  await calendar.events.insert({
-    calendarId: "primary",
-    resource: createEventResource(req.body),
-  });
+  // console.log("creating new event");
+  // await calendar.events.insert({
+  //   calendarId: "primary",
+  //   resource: createEventResource(req.body),
+  // });
   // }
+
+  try {
+    await calendar.events.insert({
+      calendarId: "primary",
+      resource: createEventResource(req.body),
+    });
+  } catch (e) {
+    if (
+      e.code === 401 &&
+      e.errors?.find(
+        (e) => e.message === "Invalid Credentials" && e.reason === "authError"
+      )
+    ) {
+      // Forward an auth error to the client to trigger re-login
+      return res.status(401).json({
+        error: "token_expired",
+        description: "The user's idp token expired, they must log in to renew",
+      });
+    } else {
+      throw e;
+    }
+  }
 
   return res.status(201).json({
     success: true,
