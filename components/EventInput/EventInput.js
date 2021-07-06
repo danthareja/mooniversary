@@ -12,6 +12,7 @@ export function EventInput({ title = "<3 Mooniversary", date }) {
   const {
     register,
     handleSubmit,
+    setValue,
     setError,
     reset,
     formState: { errors, isSubmitting, isSubmitSuccessful },
@@ -45,11 +46,10 @@ export function EventInput({ title = "<3 Mooniversary", date }) {
           `/api/auth/logout?returnTo=/api/auth/login?returnTo=/event`
         );
       } else {
-        console.error(response);
-        console.error(data);
+        setValue("description", "");
         setError("description", {
           type: "server",
-          message: "Try again later",
+          message: "Error. Try again later :(",
         });
       }
     }
@@ -61,8 +61,6 @@ export function EventInput({ title = "<3 Mooniversary", date }) {
       reset();
     }
   }, [isSubmitSuccessful, reset]);
-
-  console.log("errors", errors, "isSubmitSuccessful", isSubmitSuccessful);
 
   if (!user) {
     return (
@@ -80,11 +78,13 @@ export function EventInput({ title = "<3 Mooniversary", date }) {
         disabled={isSubmitting}
         placeholder={
           errors?.description?.type === "required"
-            ? "Write here first"
+            ? "Required"
+            : errors?.description?.type === "server"
+            ? errors.description.message
             : "What should we do?"
         }
         className={`${styles.input} ${
-          errors?.description?.type === "required" ? styles.inputError : ""
+          errors?.description ? styles.inputError : ""
         }`}
       />
       <input

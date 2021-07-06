@@ -121,6 +121,7 @@ export default withApiAuthRequired(async function handler(req, res) {
         description: "The user's idp token expired, they must log in to renew",
       });
     } else {
+      console.error(e);
       throw e;
     }
   }
