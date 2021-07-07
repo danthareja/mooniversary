@@ -16,7 +16,12 @@ const createEventResource = (body) => {
     summary: `${body.title}: ${body.description}`,
     attendees: [
       { email: "danthareja@gmail.com" },
-      { email: "fattymcrolls@gmail.com" },
+      {
+        email:
+          process.env.VERCEL_ENV === "production"
+            ? "eirapalme01@gmail.com"
+            : "fattymcrolls@gmail.com",
+      },
     ],
     start: {
       date: startDate,
