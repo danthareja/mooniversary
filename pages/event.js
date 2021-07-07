@@ -8,15 +8,13 @@ const DATE_FORMAT = "yyyy/MM/dd";
 
 export default function Home({ nextFullMoon }) {
   return (
-    <MoonSlider>
-      <div className={styles.container}>
-        <main className={styles.main}>
-          <h1 className={styles.title}>{nextFullMoon}</h1>
-          <p className={styles.description}>is our next Mooniversary</p>
-          <EventInput date={parse(nextFullMoon, DATE_FORMAT, new Date())} />
-        </main>
-      </div>
-    </MoonSlider>
+    <div className={styles.container}>
+      <main className={styles.main}>
+        <h1 className={styles.title}>{nextFullMoon}</h1>
+        <p className={styles.description}>is our next Mooniversary</p>
+        <EventInput date={parse(nextFullMoon, DATE_FORMAT, new Date())} />
+      </main>
+    </div>
   );
 }
 

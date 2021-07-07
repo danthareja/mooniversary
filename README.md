@@ -2,11 +2,42 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ## Getting Started
 
-First, run the development server:
+### Create Environmental Variables
+
+Create an Auth0 application and add the variables to a new `.env.local` file in the root directory
+
+```
+AUTH0_SECRET=
+AUTH0_DOMAIN=
+AUTH0_ISSUER_BASE_URL=
+AUTH0_CLIENT_ID=
+AUTH0_CLIENT_SECRET=
+AUTH0_MANAGEMENT_CLIENT_ID=
+AUTH0_MANAGEMENT_CLIENT_SECRET
+```
+
+> See [docs](https://github.com/auth0/nextjs-auth0) to learn about Auth0 with Next.js
+
+Alternatively, if you have access to the production deployment:
+
+```
+npm i -g vercel
+vercel link
+vercel pull env
+mv .env .env.local
+```
+
+### Run Development Server
+
+First, install dependencies:
+
+```
+yarn
+```
+
+Then, Run the development server:
 
 ```bash
-npm run dev
-# or
 yarn dev
 ```
 

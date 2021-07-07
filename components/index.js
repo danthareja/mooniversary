@@ -1,2 +1,3 @@
-export * from "./Background/Background.js";
-export * from "./MoonSlider/MoonSlider.js";
+export * from "./Background/Background";
+export * from "./EventInput/EventInput";
+export * from "./MoonSlider/MoonSlider";
