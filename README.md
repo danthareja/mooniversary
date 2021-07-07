@@ -9,7 +9,6 @@ Create an Auth0 application and add the variables to a new `.env.local` file in 
 ```
 AUTH0_SECRET=
 AUTH0_DOMAIN=
-AUTH0_BASE_URL=
 AUTH0_ISSUER_BASE_URL=
 AUTH0_CLIENT_ID=
 AUTH0_CLIENT_SECRET=
