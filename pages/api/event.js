@@ -1,7 +1,6 @@
 import { google } from "googleapis";
 import { parseISO, formatISO, add } from "date-fns";
-import { withApiAuthRequired, handleLogout } from "@auth0/nextjs-auth0";
-import { getIdPToken } from "@/lib/auth";
+import { auth0, getIdPToken } from "@/lib/auth";
 
 const createExtendedProperty = (body) => {
   return [["mooniversary", `${body.title}:${body.date}`]];
@@ -31,7 +30,7 @@ const createEventResource = (body) => {
   };
 };
 
-export default withApiAuthRequired(async function handler(req, res) {
+export default auth0.withApiAuthRequired(async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({
       error: "method_not_allowed",
