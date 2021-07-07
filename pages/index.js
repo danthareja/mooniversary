@@ -7,12 +7,6 @@ import styles from "@/styles/Home.module.css";
 const DATE_FORMAT = "yyyy/MM/dd";
 
 export default function Home({ nextFullMoon }) {
-  console.log("AUTH0_BASE_URL", process.env.AUTH0_BASE_URL);
-  console.log("VERCEL_URL", process.env.VERCEL_URL);
-  console.log("VERCEL_ENV", process.env.VERCEL_ENV);
-  console.log("NEXT_PUBLIC_VERCEL_URL", process.env.NEXT_PUBLIC_VERCEL_URL);
-  console.log("NEXT_PUBLIC_VERCEL_ENV", process.env.NEXT_PUBLIC_VERCEL_ENV);
-
   return (
     <MoonSlider>
       <div className={styles.container}>
