@@ -1,12 +1,17 @@
 import React from "react";
 import { format, parse } from "date-fns";
 import { Moon, LunarPhase } from "@/lib/moon";
-import { MoonSlider, EventInput } from "@/components";
+import { EventInput } from "@/components";
 import styles from "@/styles/Home.module.css";
 
 const DATE_FORMAT = "yyyy/MM/dd";
 
-export default function Home({ nextFullMoon }) {
+export default function Home() {
+  const nextFullMoon = format(
+    Moon.nextLunarPhase(LunarPhase.FULL),
+    DATE_FORMAT
+  );
+
   return (
     <div className={styles.container}>
       <main className={styles.main}>
@@ -16,18 +21,4 @@ export default function Home({ nextFullMoon }) {
       </main>
     </div>
   );
-}
-
-export function getStaticProps() {
-  const nextFullMoon = format(
-    Moon.nextLunarPhase(LunarPhase.FULL),
-    DATE_FORMAT
-  );
-
-  return {
-    props: {
-      nextFullMoon,
-    },
-    revalidate: 60 * 60, // 1 hour
-  };
 }
