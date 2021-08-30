@@ -2842,6 +2842,11 @@ lru-memoizer@^2.1.2, lru-memoizer@^2.1.4:
     lodash.clonedeep "^4.5.0"
     lru-cache "~4.0.0"
 
+lune@^0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/lune/-/lune-0.4.0.tgz#4ac3faaa6cd351236815212e8db7ecd8fb5e2306"
+  integrity sha1-SsP6qmzTUSNoFSEujbfs2PteIwY=
+
 make-dir@^3.0.2:
   version "3.1.0"
   resolved "https://registry.npmjs.org/make-dir/-/make-dir-3.1.0.tgz"

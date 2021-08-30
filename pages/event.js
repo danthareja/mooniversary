@@ -1,23 +1,18 @@
 import React from "react";
-import { format, parse } from "date-fns";
-import { Moon, LunarPhase } from "@/lib/moon";
+import { format } from "date-fns";
+import { getNextFullMoon } from "@/lib/moon";
 import { EventInput } from "@/components";
 import styles from "@/styles/Home.module.css";
 
-const DATE_FORMAT = "yyyy/MM/dd";
-
-export default function Home() {
-  const nextFullMoon = format(
-    Moon.nextLunarPhase(LunarPhase.FULL),
-    DATE_FORMAT
-  );
+export default function Event() {
+  const nextFullMoon = getNextFullMoon();
 
   return (
     <div className={styles.container}>
       <main className={styles.main}>
-        <h1 className={styles.title}>{nextFullMoon}</h1>
+        <h1 className={styles.title}>{format(nextFullMoon, "yyyy/MM/dd")}</h1>
         <p className={styles.description}>is our next Mooniversary</p>
-        <EventInput date={parse(nextFullMoon, DATE_FORMAT, new Date())} />
+        <EventInput date={nextFullMoon} />
       </main>
     </div>
   );
