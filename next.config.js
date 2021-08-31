@@ -1,43 +1,27 @@
-const {
-  BugsnagBuildReporterPlugin,
-  BugsnagSourceMapUploaderPlugin,
-} = require("webpack-bugsnag-plugins");
+// This file sets a custom webpack configuration to use your Next.js app
+// with Sentry.
+// https://nextjs.org/docs/api-reference/next.config.js/introduction
+// https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
-module.exports = {
+const { withSentryConfig } = require("@sentry/nextjs");
+
+const moduleExports = {
+  // Your existing module.exports
   reactStrictMode: true,
-  productionBrowserSourceMaps: true,
-  webpack: (config, { isServer, webpack }) => {
-    config.plugins.push(
-      new webpack.DefinePlugin({
-        "process.env.NEXT_INTERNAL_IS_SERVER": JSON.stringify(isServer),
-      })
-    );
-
-    // Upload source maps on production build
-    if (process.env.VERCEL && process.env.NEXT_PUBLIC_BUGSNAG_API_KEY) {
-      config.plugins.push(
-        new BugsnagBuildReporterPlugin({
-          apiKey: process.env.NEXT_PUBLIC_BUGSNAG_API_KEY,
-          appVersion: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA,
-          releaseStage: process.env.NEXT_PUBLIC_VERCEL_ENV,
-          sourceControl: {
-            provider: "github",
-            repository: `https://github.com/${process.env.VERCEL_GIT_REPO_OWNER}/${process.env.VERCEL_GIT_REPO_SLUG}`,
-            revision: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA,
-            builderName: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_AUTHOR_NAME,
-          },
-        })
-      );
-
-      config.plugins.push(
-        new BugsnagSourceMapUploaderPlugin({
-          apiKey: process.env.NEXT_PUBLIC_BUGSNAG_API_KEY,
-          appVersion: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA,
-          publicPath: `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`,
-        })
-      );
-    }
-
-    return config;
-  },
 };
+
+const SentryWebpackPluginOptions = {
+  // Additional config options for the Sentry Webpack plugin. Keep in mind that
+  // the following options are set automatically, and overriding them is not
+  // recommended:
+  //   release, url, org, project, authToken, configFile, stripPrefix,
+  //   urlPrefix, include, ignore
+
+  silent: true, // Suppresses all logs
+  // For all available options, see:
+  // https://github.com/getsentry/sentry-webpack-plugin#options.
+};
+
+// Make sure adding Sentry options is the last code to run before exporting, to
+// ensure that your source maps include changes from all other Webpack plugins
+module.exports = withSentryConfig(moduleExports, SentryWebpackPluginOptions);
