@@ -34,3 +34,7 @@
   font-size: 1.5rem;
   color: rgba(255, 255, 255, 0.9);
 }
+
+.emphasis {
+  border-bottom: 3px solid yellow;
+}
