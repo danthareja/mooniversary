@@ -23,7 +23,7 @@ Alternatively, if you have access to the production deployment:
 ```
 npm i -g vercel
 vercel link
-vercel pull env
+vercel env pull
 mv .env .env.local
 ```
 
