@@ -65,7 +65,7 @@ export function EventInput({ title = "<3 Mooniversary", date }) {
   if (!user) {
     return (
       <Link href={`/api/auth/login?returnTo=/event`} passHref>
-        <a className={styles.login}>Login to add an event</a>
+        <a className={styles.login}>Login to add to the list of adventures</a>
       </Link>
     );
   }

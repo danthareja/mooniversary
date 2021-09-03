@@ -134,6 +134,7 @@ export function MoonSliderBall({ threshold = 10, className }) {
       nodeRef={ballRef}
     >
       <div
+        data-test="moon-ball"
         className={className}
         ref={ballRef}
         style={{
@@ -178,6 +179,7 @@ export function MoonSliderBasket({ className }) {
   return (
     <div
       ref={basketRef}
+      data-test="moon-basket"
       className={className}
       style={{
         zIndex: 2,
