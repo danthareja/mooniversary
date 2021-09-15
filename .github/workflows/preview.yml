@@ -1,4 +1,4 @@
-name: ci
+name: preview
 on: [deployment_status]
 jobs:
   cypress-run:
@@ -13,8 +13,8 @@ jobs:
       - uses: cypress-io/github-action@v2
         with:
           record: true
-          tag: ci
-          group: ci
+          tag: preview
+          group: preview
         env:
           CYPRESS_BASE_URL: ${{ github.event.deployment_status.target_url }}
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
