@@ -12,5 +12,6 @@ jobs:
           start: npm start
           record: true
           tag: main
+          group: main
         env:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
