@@ -6,16 +6,14 @@ jobs:
     if: github.event.deployment_status.state == 'success'
     runs-on: ubuntu-latest
     steps:
-      - name: Print URL
-        run: echo Testing URL ${{ github.event.deployment_status.target_url }}
+      - run: echo Testing URL ${{ github.event.deployment_status.target_url }}
 
-      - name: Checkout
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-      - name: Run Cypress
-        uses: cypress-io/github-action@v2
+      - uses: cypress-io/github-action@v2
         with:
           record: true
+          tag: ci
         env:
           CYPRESS_BASE_URL: ${{ github.event.deployment_status.target_url }}
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}

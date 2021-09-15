@@ -4,17 +4,13 @@ jobs:
   cypress-run:
     runs-on: ubuntu-latest
     steps:
-      - name: Print env
-        run: env
+      - uses: actions/checkout@v2
 
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Run Cypress
-        uses: cypress-io/github-action@v2
+      - uses: cypress-io/github-action@v2
         with:
           build: npm run build
           start: npm start
-          # record: true
+          record: true
+          tag: main
         env:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
