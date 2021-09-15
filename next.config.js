@@ -4,6 +4,7 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 const { withSentryConfig } = require("@sentry/nextjs");
+console.log(process.env);
 console.log(
   "BUILDINGGGGG",
   process.env.CI === "true",
