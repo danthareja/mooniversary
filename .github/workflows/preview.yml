@@ -1,24 +1,20 @@
-name: ci
+name: preview
 on: [deployment_status]
 jobs:
-  e2e:
+  cypress-run:
     # only runs this job on successful deploy
     if: github.event.deployment_status.state == 'success'
     runs-on: ubuntu-latest
     steps:
-      - name: Print URL 🖨
-        run: echo Testing URL ${{ github.event.deployment_status.target_url }}
+      - run: echo Testing URL ${{ github.event.deployment_status.target_url }}
 
-      - name: Print GitHub env variables 🖨
-        run: npx @bahmutov/print-env GITHUB
+      - uses: actions/checkout@v2
 
-      - name: Checkout 🛎
-        uses: actions/checkout@v2
-
-      - name: Run Cypress 🌲
-        uses: cypress-io/github-action@v2
+      - uses: cypress-io/github-action@v2
         with:
           record: true
+          tag: preview
+          group: preview
         env:
           CYPRESS_BASE_URL: ${{ github.event.deployment_status.target_url }}
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
