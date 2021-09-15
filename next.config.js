@@ -4,19 +4,17 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 const { withSentryConfig } = require("@sentry/nextjs");
-console.log(process.env);
-console.log(
-  "BUILDINGGGGG",
-  process.env.CI === "true",
-  process.env.GITHUB_ACTIONS === "true"
-);
+
 const moduleExports = {
   // Your existing module.exports
   reactStrictMode: true,
+  // Sentry release is taken care of as part of a Vercel plugin
+  // and just gets in the way when running in GitHub
   //
+  // Note: This is also automatically ignored in dev
   sentry: {
-    disableServerWebpackPlugin: true,
-    disableClientWebpackPlugin: true,
+    disableServerWebpackPlugin: process.env.GITHUB_ACTIONS === "true",
+    disableClientWebpackPlugin: process.env.GITHUB_ACTIONS === "true",
   },
 };
 
