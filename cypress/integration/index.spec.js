@@ -38,4 +38,8 @@ describe("index page", () => {
       .findEl("next-mooniversary-date")
       .findEl("next-mooniversary-number");
   });
+
+  it("should fail", () => {
+    expect(false).to.equal(true);
+  });
 });
