@@ -4,10 +4,19 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 const { withSentryConfig } = require("@sentry/nextjs");
-
+console.log(
+  "BUILDINGGGGG",
+  process.env.CI === "true",
+  process.env.GITHUB_ACTIONS === "true"
+);
 const moduleExports = {
   // Your existing module.exports
   reactStrictMode: true,
+  //
+  sentry: {
+    disableServerWebpackPlugin: true,
+    disableClientWebpackPlugin: true,
+  },
 };
 
 const SentryWebpackPluginOptions = {
