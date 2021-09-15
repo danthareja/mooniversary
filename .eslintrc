@@ -1,3 +1,9 @@
 {
-  "extends": ["next", "next/core-web-vitals", "prettier"]
+  "extends": ["next", "next/core-web-vitals", "prettier", "plugin:cypress/recommended"],
+  "plugins": [
+    "cypress"
+  ],
+  "env": {
+    "cypress/globals": true
+  }
 }
