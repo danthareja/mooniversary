@@ -5,7 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Print env
-      - run: env
+        run: env
 
       - name: Checkout
         uses: actions/checkout@v2
