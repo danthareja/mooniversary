@@ -23,5 +23,5 @@ jobs:
         env:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
 
-      - run: nyc report --reporter=text-summary --check-coverage
+      - run: yarn run nyc report --reporter=text-summary --check-coverage
         name: Check code coverage
