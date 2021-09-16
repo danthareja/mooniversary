@@ -6,11 +6,19 @@ jobs:
     if: github.event.deployment_status.state == 'success'
     runs-on: ubuntu-latest
     steps:
-      - run: echo Testing URL ${{ github.event.deployment_status.target_url }}
+      - uses: szenius/set-timezone@v1.0
+        name: Set timezone
+        with:
+          timezoneLinux: "America/Edmonton"
+
+      - run: echo Preview URL ${{ github.event.deployment_status.target_url }}
+        name: Print preview url
 
       - uses: actions/checkout@v2
+        name: Checkout
 
       - uses: cypress-io/github-action@v2
+        name: Run Cypress
         with:
           record: true
           tag: preview
