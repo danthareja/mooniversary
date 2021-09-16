@@ -1,17 +1,29 @@
 name: main
 on: [push]
 jobs:
-  cypress-run:
+  test:
     runs-on: ubuntu-latest
     steps:
+      - uses: szenius/set-timezone@v1.0
+        name: Set timezone
+        with:
+          timezoneLinux: "America/Edmonton"
+
       - uses: actions/checkout@v2
+        name: Checkout
 
       - uses: cypress-io/github-action@v2
+        name: Run Cypress
         with:
-          build: npm run build
-          start: npm start
+          build: yarn build
+          start: |
+            yarn lint
+            yarn start
           record: true
           tag: main
           group: main
         env:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+
+      - run: yarn run nyc report --reporter=text-summary --check-coverage
+        name: Check code coverage
