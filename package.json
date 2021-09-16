@@ -40,15 +40,6 @@
     "prettier": "2.3.1",
     "start-server-and-test": "^1.14.0"
   },
-  "nyc": {
-    "branches": 30,
-    "lines": 50,
-    "functions": 50,
-    "statements": 50,
-    "exclude": [
-      "pages/api/__coverage__.js"
-    ]
-  },
   "lint-staged": {
     "*.js": "eslint --cache --fix",
     "*.{js,css,md}": "prettier --write"
