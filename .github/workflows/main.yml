@@ -12,14 +12,13 @@ jobs:
       - uses: actions/checkout@v2
         name: Checkout
 
-      - uses: yarn lint
-        name: Lint files
-
       - uses: cypress-io/github-action@v2
         name: Run Cypress
         with:
           build: yarn build
-          start: yarn start
+          start: |
+            yarn lint
+            yarn start
           record: true
           tag: main
           group: main
