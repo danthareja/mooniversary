@@ -1,7 +1,7 @@
 name: main
 on: [push]
 jobs:
-  cypress-run:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: szenius/set-timezone@v1.0

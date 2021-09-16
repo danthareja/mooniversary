@@ -1,7 +1,7 @@
 name: preview
 on: [deployment_status]
 jobs:
-  cypress-run:
+  test-preview:
     # only runs this job on successful deploy
     if: github.event.deployment_status.state == 'success'
     runs-on: ubuntu-latest
