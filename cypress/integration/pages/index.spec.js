@@ -1,14 +1,20 @@
+import { sub } from "date-fns";
+
 describe("index page", () => {
   // We cannot load JSON file using "cy.fixture"
   // because it means the test is already running.
   // Same with using "before" hook - new tests cannot be created from "before" hook.
   // Instead we need to load JSON file using "require" at the start time
   // and generate tests.
-  const moons = require("../../fixtures/moons");
+  const mooniversaries = require("../../fixtures/mooniversaries");
 
-  moons.forEach((moon) => {
-    it(`should show the correct mooniversary on ${moon.clockDate}`, () => {
-      cy.clock(new Date(moon.clockDate), ["Date"]);
+  mooniversaries.forEach((mooniversary) => {
+    it(`should show the ${mooniversary.numberText} mooniversary the day before ${mooniversary.date}`, () => {
+      const dayBeforeMooniversary = sub(new Date(mooniversary.date), {
+        days: 1,
+      });
+
+      cy.clock(dayBeforeMooniversary, ["Date"]);
       cy.visit("/");
 
       cy.getEl("moon-ball").should("be.visible").as("ball");
@@ -37,11 +43,11 @@ describe("index page", () => {
 
       cy.getEl("next-mooniversary")
         .findEl("next-mooniversary-date")
-        .should("contain.text", moon.mooniversaryDate)
+        .should("contain.text", mooniversary.dateText)
         .findEl("next-mooniversary-number")
         .should(
           "contain.text",
-          `will be our ${moon.mooniversaryNumber} Mooniversary`
+          `will be our ${mooniversary.numberText} Mooniversary`
         );
     });
   });
