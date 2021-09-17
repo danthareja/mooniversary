@@ -7,6 +7,7 @@ export default function Index() {
   const {
     mooniversaryNumber,
     mooniversaryNumberText,
+    mooniversaryNumberTextVerb,
     mooniversaryDate,
     mooniversaryDateText,
     setMooniversaryNumber,
@@ -23,7 +24,7 @@ export default function Index() {
             className={styles.description}
             data-test="next-mooniversary-number"
           >
-            will be our{" "}
+            {mooniversaryNumberTextVerb}{" "}
             <EditText
               className={styles.number}
               name="mooniversary"

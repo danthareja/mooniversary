@@ -8,7 +8,7 @@ export class EditText extends React.Component {
     this.state = {
       previousValue: props.defaultValue || "",
       savedValue: props.defaultValue || "",
-      editMode: true,
+      editMode: false,
     };
     this.inputRef = React.createRef();
   }
