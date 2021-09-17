@@ -4,7 +4,7 @@ describe("index page", () => {
   // Same with using "before" hook - new tests cannot be created from "before" hook.
   // Instead we need to load JSON file using "require" at the start time
   // and generate tests.
-  const moons = require("../fixtures/moons");
+  const moons = require("../../fixtures/moons");
 
   moons.forEach((moon) => {
     it(`should show the correct mooniversary on ${moon.clockDate}`, () => {
