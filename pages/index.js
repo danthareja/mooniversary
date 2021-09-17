@@ -1,33 +1,33 @@
 import React from "react";
-import { useNextMooniversary } from "@/lib/hooks";
+import { useMooniversary } from "@/lib/hooks";
 import { MoonSlider, EventInput } from "@/components";
 import styles from "@/styles/Home.module.css";
 
 export default function Index() {
   const {
-    nextMooniversaryDate,
-    nextMooniversaryDateText,
-    nextMooniversaryNumberText,
-  } = useNextMooniversary();
+    mooniversaryNumber,
+    mooniversaryNumberText,
+    mooniversaryDate,
+    mooniversaryDateText,
+    setMooniversaryNumber,
+  } = useMooniversary();
 
   return (
     <MoonSlider>
       <div className={styles.container}>
         <main className={styles.main} data-test="next-mooniversary">
           <h1 className={styles.title} data-test="next-mooniversary-date">
-            {nextMooniversaryDateText}
+            {mooniversaryDateText}
           </h1>
           <p
             className={styles.description}
             data-test="next-mooniversary-number"
           >
             will be our{" "}
-            <span className={styles.emphasis}>
-              {nextMooniversaryNumberText}
-            </span>{" "}
+            <span className={styles.emphasis}>{mooniversaryNumberText}</span>{" "}
             Mooniversary
           </p>
-          {/* <EventInput date={nextMooniversaryDate} /> */}
+          {/* <EventInput date={mooniversaryDate} /> */}
         </main>
       </div>
     </MoonSlider>
