@@ -33,8 +33,40 @@
   line-height: 1.5;
   font-size: 1.5rem;
   color: rgba(255, 255, 255, 0.9);
+
+  display: block;
+  margin-block-start: 1em;
+  margin-block-end: 1em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
 }
 
-.emphasis {
+div.number {
+  display: inline;
+  line-height: inherit;
+  font-size: inherit;
+  color: inherit;
+
   border-bottom: 3px solid yellow;
+}
+
+input.number {
+  display: inline;
+  border: none;
+  background-image: none;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+
+  /* line-height: inherit; */
+  font-size: inherit;
+  color: inherit;
+  text-align: center;
+
+  background-color: rgba(100, 100, 100, 0.4);
+  border-bottom: 3px solid yellow;
+}
+
+input.number:focus {
+  outline: yellow;
 }
