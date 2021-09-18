@@ -33,6 +33,7 @@ export default function Index() {
               max="999"
               required
               size={3}
+              autoComplete="off"
               defaultValue={mooniversaryNumber.toString()}
               label={mooniversaryNumberText}
               onSave={({ value }) => {
