@@ -68,5 +68,9 @@ input.number {
 }
 
 input.number:focus {
-  outline: yellow;
+  outline: none;
+}
+
+input.number:invalid {
+  border-bottom: 3px solid #ff5722;
 }
