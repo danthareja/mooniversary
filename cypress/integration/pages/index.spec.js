@@ -1,4 +1,4 @@
-import { sub } from "date-fns";
+import { add, sub, parseISO, compareAsc, compareDesc } from "date-fns";
 
 describe("index page", () => {
   // We cannot load JSON file using "cy.fixture"
@@ -6,49 +6,98 @@ describe("index page", () => {
   // Same with using "before" hook - new tests cannot be created from "before" hook.
   // Instead we need to load JSON file using "require" at the start time
   // and generate tests.
-  const mooniversaries = require("../../fixtures/mooniversaries").slice(0, 1);
+  const mooniversaries = require("../../fixtures/mooniversaries");
 
   mooniversaries.forEach((mooniversary) => {
-    it(`should show the ${mooniversary.numberText} mooniversary the day before ${mooniversary.date}`, () => {
-      const dayBeforeMooniversary = sub(new Date(mooniversary.date), {
+    const mooniversaryDate = parseISO(mooniversary.date);
+
+    it(`should show '${mooniversary.dateText} will be our ${mooniversary.numberText}' mooniversary the day before`, () => {
+      const dayBeforeMooniversary = sub(parseISO(mooniversary.date), {
         days: 1,
       });
-
       cy.clock(dayBeforeMooniversary, ["Date"]);
       cy.visit("/");
-
-      cy.getEl("moon-ball").should("be.visible").as("ball");
-      cy.getEl("moon-basket").should("be.visible").as("basket");
-
-      // Drag and drop moon
-      cy.get("@ball").then(($ball) => {
-        cy.get("@basket").then(($basket) => {
-          const basket = $basket[0].getBoundingClientRect();
-          const offset = $ball.width() / 2;
-          cy.wrap($ball)
-            .trigger("mousedown", { button: 0 })
-            .trigger("mousemove", {
-              clientX: basket.x + offset,
-              clientY: basket.y + offset,
-            })
-            // For some reason, we need at least two mouse move events
-            // in order to trigger the screen correctly
-            // no idea why this could be a problem for future dan
-            .trigger("mousemove", {
-              clientX: basket.x + offset,
-              clientY: basket.y + offset,
-            });
-        });
+      cy.dragMoon();
+      cy.checkMooniversary({
+        dateText: mooniversary.dateText,
+        numberText: `will be our ${mooniversary.numberText} Mooniversary`,
       });
+    });
 
-      cy.getEl("next-mooniversary")
-        .findEl("next-mooniversary-date")
-        .should("contain.text", mooniversary.dateText)
-        .findEl("next-mooniversary-number")
-        .should(
-          "contain.text",
-          `will be our ${mooniversary.numberText} Mooniversary`
-        );
+    it(`should show 'today is our ${mooniversary.numberText}' mooniversary the day of`, () => {
+      cy.clock(mooniversaryDate, ["Date"]);
+      cy.visit("/");
+      cy.dragMoon();
+      cy.checkMooniversary({
+        dateText: "Today",
+        numberText: `is our ${mooniversary.numberText} Mooniversary`,
+      });
+    });
+
+    it(`should show '${mooniversary.dateText} was our ${mooniversary.numberText}' mooniversary the day after`, () => {
+      const dayAfterMooniversary = add(parseISO(mooniversary.date), {
+        days: 1,
+      });
+      cy.clock(dayAfterMooniversary, ["Date"]);
+      cy.visit("/");
+      cy.dragMoon();
+
+      cy.getEl("edit-text-label").click();
+      cy.getEl("edit-text-input").clear().type(`${mooniversary.number}{enter}`);
+      cy.checkMooniversary({
+        dateText: mooniversary.dateText,
+        numberText: `was our ${mooniversary.numberText} Mooniversary`,
+      });
+    });
+  });
+
+  it("should show the correct future mooniversary when typing in the input", () => {
+    const earliestMooniversary = mooniversaries.sort((a, b) =>
+      compareAsc(parseISO(a.date), parseISO(b.date))
+    )[0];
+
+    cy.clock(sub(parseISO(earliestMooniversary.date), { days: 2 }), ["Date"]);
+    cy.visit("/");
+    cy.dragMoon();
+    cy.checkMooniversary({
+      dateText: earliestMooniversary.dateText,
+      numberText: `will be our ${earliestMooniversary.numberText} Mooniversary`,
+    });
+
+    // Label should not change when the escape key is pressed
+    cy.getEl("edit-text-label").click();
+    cy.getEl("edit-text-input").clear().type(`{esc}`);
+    cy.checkMooniversary({
+      dateText: earliestMooniversary.dateText,
+      numberText: `will be our ${earliestMooniversary.numberText} Mooniversary`,
+    });
+
+    mooniversaries.forEach((mooniversary) => {
+      cy.getEl("edit-text-label").click();
+      cy.getEl("edit-text-input").clear().type(`${mooniversary.number}{enter}`);
+      cy.checkMooniversary({
+        dateText: mooniversary.dateText,
+        numberText: `will be our ${mooniversary.numberText} Mooniversary`,
+      });
+    });
+  });
+
+  it("should show the correct past mooniversary when typing in the input", () => {
+    const latestMooniversary = mooniversaries.sort((a, b) =>
+      compareDesc(parseISO(a.date), parseISO(b.date))
+    )[0];
+
+    cy.clock(add(parseISO(latestMooniversary.date), { days: 2 }), ["Date"]);
+    cy.visit("/");
+    cy.dragMoon();
+
+    mooniversaries.forEach((mooniversary) => {
+      cy.getEl("edit-text-label").click();
+      cy.getEl("edit-text-input").clear().type(`${mooniversary.number}{enter}`);
+      cy.checkMooniversary({
+        dateText: mooniversary.dateText,
+        numberText: `was our ${mooniversary.numberText} Mooniversary`,
+      });
     });
   });
 });

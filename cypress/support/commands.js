@@ -35,3 +35,37 @@ Cypress.Commands.add(
     cy.wrap(subject).get(`[data-test=${selector}]`, ...args);
   }
 );
+
+Cypress.Commands.add("dragMoon", () => {
+  cy.getEl("moon-ball").should("be.visible").as("ball");
+  cy.getEl("moon-basket").should("be.visible").as("basket");
+
+  // Drag and drop moon
+  cy.get("@ball").then(($ball) => {
+    cy.get("@basket").then(($basket) => {
+      const basket = $basket[0].getBoundingClientRect();
+      const offset = $ball.width() / 2;
+      cy.wrap($ball)
+        .trigger("mousedown", { button: 0 })
+        .trigger("mousemove", {
+          clientX: basket.x + offset,
+          clientY: basket.y + offset,
+        })
+        // For some reason, we need at least two mouse move events
+        // in order to trigger the screen correctly
+        // no idea why this could be a problem for future dan
+        .trigger("mousemove", {
+          clientX: basket.x + offset,
+          clientY: basket.y + offset,
+        });
+    });
+  });
+});
+
+Cypress.Commands.add("checkMooniversary", ({ dateText, numberText }) => {
+  cy.getEl("next-mooniversary")
+    .findEl("next-mooniversary-date")
+    .should("contain.text", dateText)
+    .findEl("next-mooniversary-number")
+    .should("contain.text", numberText);
+});

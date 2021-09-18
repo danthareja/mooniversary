@@ -108,6 +108,7 @@ export class EditText extends React.Component {
         return (
           <input
             {...inputProps}
+            data-test="edit-text-input"
             id={id}
             className={classnames(className)}
             style={style}
@@ -128,6 +129,7 @@ export class EditText extends React.Component {
         return (
           <input
             {...inputProps}
+            data-test="edit-text-input"
             id={id}
             className={classnames(className)}
             style={style}
@@ -146,6 +148,7 @@ export class EditText extends React.Component {
       return (
         <div
           id={id}
+          data-test="edit-text-label"
           className={classnames(
             styles.label,
             {

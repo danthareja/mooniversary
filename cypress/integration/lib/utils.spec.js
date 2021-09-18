@@ -1,7 +1,7 @@
-import { format } from "date-fns";
-import { findMooniversaryDate } from "../../../lib/utils/mooniversary";
+import { parseISO } from "date-fns";
+import { findMooniversaryDate } from "../../../lib/utils";
 
-describe("mooniversary", () => {
+describe("utils", () => {
   describe("#findMooniversaryDate", () => {
     // We cannot load JSON file using "cy.fixture"
     // because it means the test is already running.
@@ -12,11 +12,9 @@ describe("mooniversary", () => {
 
     mooniversaries.forEach((mooniversary) => {
       it(`should find mooniversary number ${mooniversary.number}`, () => {
-        const mooniversaryDate = format(
-          findMooniversaryDate(mooniversary.number),
-          "yyyy-MM-dd"
-        );
-        expect(mooniversaryDate).to.equal(mooniversary.date);
+        const actualDate = findMooniversaryDate(mooniversary.number);
+        const expectedDate = parseISO(mooniversary.date);
+        expect(actualDate.toString()).to.equal(expectedDate.toString());
       });
     });
   });
