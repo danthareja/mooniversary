@@ -10,13 +10,15 @@
     "prepare": "husky install",
     "test": "start-test dev 3000 cy:open",
     "cy:open": "cypress open",
-    "pretest": "rm -rf .nyc_output coverage .next || true"
+    "pretest": "rm -rf .nyc_output coverage .next || true",
+    "check-coverage": "nyc report --reporter=text-summary --check-coverage"
   },
   "dependencies": {
     "@auth0/nextjs-auth0": "^1.4.2",
     "@sentry/nextjs": "^6.12.0",
     "auth0": "^2.35.1",
     "babel-plugin-istanbul": "^6.0.0",
+    "classnames": "^2.3.1",
     "date-fns": "^2.22.1",
     "googleapis": "^80.1.0",
     "lune": "^0.4.0",
