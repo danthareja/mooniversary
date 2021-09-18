@@ -42,8 +42,7 @@ describe("index page", () => {
       cy.visit("/");
       cy.dragMoon();
 
-      cy.getEl("edit-text-label").click();
-      cy.getEl("edit-text-input").clear().type(`${mooniversary.number}{enter}`);
+      cy.updateMooniversary(`${mooniversary.number}{enter}`);
       cy.checkMooniversary({
         dateText: mooniversary.dateText,
         numberText: `was our ${mooniversary.numberText} Mooniversary`,
@@ -65,16 +64,28 @@ describe("index page", () => {
     });
 
     // Label should not change when the escape key is pressed
-    cy.getEl("edit-text-label").click();
-    cy.getEl("edit-text-input").clear().type(`{esc}`);
+    cy.updateMooniversary("{esc}");
+    cy.checkMooniversary({
+      dateText: earliestMooniversary.dateText,
+      numberText: `will be our ${earliestMooniversary.numberText} Mooniversary`,
+    });
+
+    // Label should not change if an invalid input entered
+    cy.updateMooniversary("-1{enter}");
+    cy.checkMooniversary({
+      dateText: earliestMooniversary.dateText,
+      numberText: `will be our ${earliestMooniversary.numberText} Mooniversary`,
+    });
+
+    // Label should not change if an invalid input entered
+    cy.updateMooniversary("9999{enter}");
     cy.checkMooniversary({
       dateText: earliestMooniversary.dateText,
       numberText: `will be our ${earliestMooniversary.numberText} Mooniversary`,
     });
 
     mooniversaries.forEach((mooniversary) => {
-      cy.getEl("edit-text-label").click();
-      cy.getEl("edit-text-input").clear().type(`${mooniversary.number}{enter}`);
+      cy.updateMooniversary(`${mooniversary.number}{enter}`);
       cy.checkMooniversary({
         dateText: mooniversary.dateText,
         numberText: `will be our ${mooniversary.numberText} Mooniversary`,
@@ -92,8 +103,7 @@ describe("index page", () => {
     cy.dragMoon();
 
     mooniversaries.forEach((mooniversary) => {
-      cy.getEl("edit-text-label").click();
-      cy.getEl("edit-text-input").clear().type(`${mooniversary.number}{enter}`);
+      cy.updateMooniversary(`${mooniversary.number}{enter}`);
       cy.checkMooniversary({
         dateText: mooniversary.dateText,
         numberText: `was our ${mooniversary.numberText} Mooniversary`,

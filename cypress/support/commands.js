@@ -69,3 +69,8 @@ Cypress.Commands.add("checkMooniversary", ({ dateText, numberText }) => {
     .findEl("next-mooniversary-number")
     .should("contain.text", numberText);
 });
+
+Cypress.Commands.add("updateMooniversary", (inputString) => {
+  cy.getEl("edit-text-label").click();
+  cy.getEl("edit-text-input").clear().type(inputString);
+});
