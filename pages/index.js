@@ -28,13 +28,12 @@ export default function Index() {
             <EditText
               className={styles.number}
               name="mooniversary"
-              type="tel"
-              minLength="1"
-              maxLength="3"
-              pattern="[1-9][0-9]{0,2}"
+              type="number"
+              min="1"
+              max="999"
               required
               size={3}
-              inline={true}
+              autoComplete="off"
               defaultValue={mooniversaryNumber.toString()}
               label={mooniversaryNumberText}
               onSave={({ value }) => {

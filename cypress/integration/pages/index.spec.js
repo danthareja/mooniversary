@@ -11,15 +11,29 @@ describe("index page", () => {
   mooniversaries.forEach((mooniversary) => {
     const mooniversaryDate = parseISO(mooniversary.date);
 
-    it(`should show '${mooniversary.dateText} will be our ${mooniversary.numberText}' mooniversary the day before`, () => {
-      const dayBeforeMooniversary = sub(parseISO(mooniversary.date), {
-        days: 1,
+    it(`should show '${mooniversary.dateText} will be our ${mooniversary.numberText}' mooniversary way before`, () => {
+      const wayBeforeMooniversary = sub(parseISO(mooniversary.date), {
+        days: 7, // Subtract 7 days so relative dates don't come up
       });
-      cy.clock(dayBeforeMooniversary, ["Date"]);
+      cy.clock(wayBeforeMooniversary, ["Date"]);
       cy.visit("/");
       cy.dragMoon();
       cy.checkMooniversary({
         dateText: mooniversary.dateText,
+        numberText: `will be our ${mooniversary.numberText} Mooniversary`,
+      });
+    });
+
+    it(`should show 'tomorrow is our ${mooniversary.numberText}' mooniversary the day before`, () => {
+      const dayBeforeMooniversary = sub(parseISO(mooniversary.date), {
+        days: 1,
+      });
+      cy.clock(dayBeforeMooniversary, ["Date"]);
+      cy.clock(mooniversaryDate, ["Date"]);
+      cy.visit("/");
+      cy.dragMoon();
+      cy.checkMooniversary({
+        dateText: "Tomorrow",
         numberText: `will be our ${mooniversary.numberText} Mooniversary`,
       });
     });
@@ -34,7 +48,7 @@ describe("index page", () => {
       });
     });
 
-    it(`should show '${mooniversary.dateText} was our ${mooniversary.numberText}' mooniversary the day after`, () => {
+    it(`should show 'yesterday was our ${mooniversary.numberText}' mooniversary the day after`, () => {
       const dayAfterMooniversary = add(parseISO(mooniversary.date), {
         days: 1,
       });
@@ -42,8 +56,22 @@ describe("index page", () => {
       cy.visit("/");
       cy.dragMoon();
 
-      cy.getEl("edit-text-label").click();
-      cy.getEl("edit-text-input").clear().type(`${mooniversary.number}{enter}`);
+      cy.updateMooniversary(`${mooniversary.number}{enter}`);
+      cy.checkMooniversary({
+        dateText: "Yesterday",
+        numberText: `was our ${mooniversary.numberText} Mooniversary`,
+      });
+    });
+
+    it(`should show '${mooniversary.dateText} was our ${mooniversary.numberText}' mooniversary way after`, () => {
+      const wayAfterMooniversary = add(parseISO(mooniversary.date), {
+        days: 7, // Add 7 days so relative dates don't come up
+      });
+      cy.clock(wayAfterMooniversary, ["Date"]);
+      cy.visit("/");
+      cy.dragMoon();
+
+      cy.updateMooniversary(`${mooniversary.number}{enter}`);
       cy.checkMooniversary({
         dateText: mooniversary.dateText,
         numberText: `was our ${mooniversary.numberText} Mooniversary`,
@@ -56,7 +84,8 @@ describe("index page", () => {
       compareAsc(parseISO(a.date), parseISO(b.date))
     )[0];
 
-    cy.clock(sub(parseISO(earliestMooniversary.date), { days: 2 }), ["Date"]);
+    // Subtract 7 days so relative dates don't come up
+    cy.clock(sub(parseISO(earliestMooniversary.date), { days: 7 }), ["Date"]);
     cy.visit("/");
     cy.dragMoon();
     cy.checkMooniversary({
@@ -65,16 +94,28 @@ describe("index page", () => {
     });
 
     // Label should not change when the escape key is pressed
-    cy.getEl("edit-text-label").click();
-    cy.getEl("edit-text-input").clear().type(`{esc}`);
+    cy.updateMooniversary("{esc}");
+    cy.checkMooniversary({
+      dateText: earliestMooniversary.dateText,
+      numberText: `will be our ${earliestMooniversary.numberText} Mooniversary`,
+    });
+
+    // Label should not change if an invalid input entered
+    cy.updateMooniversary("-1{enter}");
+    cy.checkMooniversary({
+      dateText: earliestMooniversary.dateText,
+      numberText: `will be our ${earliestMooniversary.numberText} Mooniversary`,
+    });
+
+    // Label should not change if an invalid input entered
+    cy.updateMooniversary("9999{enter}");
     cy.checkMooniversary({
       dateText: earliestMooniversary.dateText,
       numberText: `will be our ${earliestMooniversary.numberText} Mooniversary`,
     });
 
     mooniversaries.forEach((mooniversary) => {
-      cy.getEl("edit-text-label").click();
-      cy.getEl("edit-text-input").clear().type(`${mooniversary.number}{enter}`);
+      cy.updateMooniversary(`${mooniversary.number}{enter}`);
       cy.checkMooniversary({
         dateText: mooniversary.dateText,
         numberText: `will be our ${mooniversary.numberText} Mooniversary`,
@@ -87,13 +128,13 @@ describe("index page", () => {
       compareDesc(parseISO(a.date), parseISO(b.date))
     )[0];
 
-    cy.clock(add(parseISO(latestMooniversary.date), { days: 2 }), ["Date"]);
+    // Add 7 days so relative dates don't come up
+    cy.clock(add(parseISO(latestMooniversary.date), { days: 7 }), ["Date"]);
     cy.visit("/");
     cy.dragMoon();
 
     mooniversaries.forEach((mooniversary) => {
-      cy.getEl("edit-text-label").click();
-      cy.getEl("edit-text-input").clear().type(`${mooniversary.number}{enter}`);
+      cy.updateMooniversary(`${mooniversary.number}{enter}`);
       cy.checkMooniversary({
         dateText: mooniversary.dateText,
         numberText: `was our ${mooniversary.numberText} Mooniversary`,
