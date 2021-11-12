@@ -63,11 +63,17 @@ Cypress.Commands.add("dragMoon", () => {
 });
 
 Cypress.Commands.add("checkMooniversary", ({ dateText, numberText }) => {
-  cy.getEl("next-mooniversary")
-    .findEl("next-mooniversary-date")
-    .should("contain.text", dateText)
-    .findEl("next-mooniversary-number")
-    .should("contain.text", numberText);
+  if (dateText) {
+    cy.getEl("next-mooniversary")
+      .findEl("next-mooniversary-date")
+      .should("contain.text", dateText);
+  }
+
+  if (numberText) {
+    cy.getEl("next-mooniversary")
+      .findEl("next-mooniversary-number")
+      .should("contain.text", numberText);
+  }
 });
 
 Cypress.Commands.add("updateMooniversary", (inputString) => {
