@@ -5,7 +5,8 @@ import "@/styles/globals.css";
 
 function MyApp({ Component, pageProps }) {
   return (
-    <UserProvider>
+    // <UserProvider>
+    <>
       <Head>
         <title>Mooniversary</title>
         <meta name="description" content="Mooniversary tracking app" />
@@ -16,7 +17,8 @@ function MyApp({ Component, pageProps }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Component {...pageProps} />
-    </UserProvider>
+    </>
+    // </UserProvider>
   );
 }
 

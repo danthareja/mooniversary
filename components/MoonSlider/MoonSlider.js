@@ -21,10 +21,10 @@ const createEmptyBoundingClientRect = () => {
   };
 };
 
-export function MoonSlider({ size, children }) {
+export function MoonSlider({ size, onComplete, children }) {
   const ref = React.useRef(null);
   return (
-    <MoonSliderProvider size={size}>
+    <MoonSliderProvider size={size} onComplete={onComplete}>
       <MoonContext.Consumer>
         {({ isComplete }) => {
           return (
@@ -63,7 +63,7 @@ export function MoonSlider({ size, children }) {
   );
 }
 
-export function MoonSliderProvider({ size = 100, children }) {
+export function MoonSliderProvider({ size = 100, onComplete, children }) {
   const [basket, setBasket] = React.useState(createEmptyBoundingClientRect());
   const [ball, setBall] = React.useState(createEmptyBoundingClientRect());
   const [isComplete, setIsComplete] = React.useState(false);
@@ -77,6 +77,9 @@ export function MoonSliderProvider({ size = 100, children }) {
     isComplete,
     complete: () => {
       if (!isComplete) {
+        if (typeof onComplete === "function") {
+          onComplete();
+        }
         setIsComplete(true);
       }
     },

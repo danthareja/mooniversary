@@ -1,14 +1,14 @@
 import React from "react";
 import { useMooniversary } from "@/lib/hooks";
-import { Background, MoonSlider, EditText, EventInput } from "@/components";
+import { Background, MoonSlider, EditText } from "@/components";
 import styles from "@/styles/Home.module.css";
 
 export default function Index() {
   const {
+    logGlobalFormatInstructions,
     mooniversaryNumber,
     mooniversaryNumberText,
     mooniversaryNumberTextVerb,
-    mooniversaryDate,
     mooniversaryDateText,
     setMooniversaryNumber,
   } = useMooniversary();
@@ -16,7 +16,7 @@ export default function Index() {
   return (
     <>
       <Background />
-      <MoonSlider>
+      <MoonSlider onComplete={logGlobalFormatInstructions}>
         <div className={styles.container}>
           <main className={styles.main} data-test="next-mooniversary">
             <h1 className={styles.title} data-test="next-mooniversary-date">
@@ -45,7 +45,6 @@ export default function Index() {
               />{" "}
               Mooniversary
             </div>
-            {/* <EventInput date={mooniversaryDate} /> */}
           </main>
         </div>
       </MoonSlider>
