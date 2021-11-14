@@ -85,6 +85,11 @@ export function MoonSliderProvider({ size = 100, onComplete, children }) {
     },
   };
 
+  // DONT CHECK ME IN
+  React.useEffect(() => {
+    value.complete();
+  }, []);
+
   return <MoonContext.Provider value={value}>{children}</MoonContext.Provider>;
 }
 
