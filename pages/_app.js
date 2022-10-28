@@ -1,7 +1,10 @@
 import React from "react";
 import Head from "next/head";
 import { UserProvider } from "@auth0/nextjs-auth0";
+
+import "@/styles/bootstrap.min.css";
 import "@/styles/globals.css";
+import "@/styles/birthday.css";
 
 function MyApp({ Component, pageProps }) {
   return (
