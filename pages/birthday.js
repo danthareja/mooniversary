@@ -13,7 +13,7 @@ export default function Birthday() {
           <div className="box">
             <div className="box-body">
               <div className="img" height={150} width={150}>
-                <Image src="/bibs.jpeg" alt="bibs" height={150} width={150} />
+                <Image src="/bibs.png" alt="bibs" height={150} width={150} />
               </div>
               <div className="box-lid">
                 <div className="box-bowtie"></div>

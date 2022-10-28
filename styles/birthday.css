@@ -35,6 +35,7 @@ body {
   transition: all 0.5s;
   margin: 0 auto;
   display: block;
+  padding-left: 20px;
 }
 .box-body:hover {
   cursor: pointer;
