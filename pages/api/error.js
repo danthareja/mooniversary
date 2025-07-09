@@ -1,8 +1,0 @@
-import { withSentry } from "@sentry/nextjs";
-
-const handler = async (req, res) => {
-  throw new Error("hello from error handler");
-  res.status(200).json({ name: "John Doe" });
-};
-
-export default withSentry(handler);

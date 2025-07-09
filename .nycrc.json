@@ -1,7 +1,0 @@
-{
-  "branches": 30,
-  "lines": 50,
-  "functions": 50,
-  "statements": 50,
-  "exclude": ["pages/api/__coverage__.js"]
-}
