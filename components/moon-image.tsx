@@ -39,7 +39,6 @@ export function MoonImage({
 
   React.useEffect(() => {
     const checkImage = async () => {
-      // Don't attempt to load images for future moons
       if (moonNumber > nextMooniversaryNumber) {
         setHasImage(false);
         setIsImageLoading(false);
