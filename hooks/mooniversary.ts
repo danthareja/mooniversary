@@ -12,6 +12,7 @@ import {
   getNextMooniversaryNumber,
   getNextMooniversaryDate,
   findMooniversaryDate,
+  getToday,
 } from "@/lib/mooniversary";
 
 export const useMooniversary = () => {
@@ -45,7 +46,7 @@ export const useMooniversary = () => {
   ]);
 
   const mooniversaryDateText = React.useMemo(() => {
-    const today = new Date();
+    const today = getToday();
     const relativeDate = formatRelative(mooniversaryDate, today);
     if (relativeDate.includes("at")) {
       const relativeDay = relativeDate.split(" at ")[0];
@@ -58,7 +59,7 @@ export const useMooniversary = () => {
   }, [mooniversaryDate]);
 
   const mooniversaryNumberTextVerb = React.useMemo(() => {
-    const today = new Date();
+    const today = getToday();
     if (isSameDay(mooniversaryDate, today)) {
       return "is our";
     } else if (isBefore(mooniversaryDate, today)) {

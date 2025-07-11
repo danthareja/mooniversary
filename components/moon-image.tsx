@@ -35,10 +35,8 @@ export function MoonImage({
   const thumbnailUrl = `/api/images/${moonNumber}/thumbnail?v=${imageKey}`;
   const fullImageUrl = `/api/images/${moonNumber}?v=${imageKey}`;
 
-  // Check if uploads are allowed for this moon (only current and previous moons)
   const isUploadAllowed = moonNumber <= nextMooniversaryNumber;
 
-  // Check if image exists
   React.useEffect(() => {
     const checkImage = async () => {
       // Don't attempt to load images for future moons
@@ -50,35 +48,31 @@ export function MoonImage({
 
       setIsImageLoading(true);
       try {
-        const checkUrl = `/api/images/${moonNumber}/thumbnail?v=${imageKey}`;
-        const response = await fetch(checkUrl);
+        const response = await fetch(thumbnailUrl);
 
         if (response.ok) {
           setHasImage(true);
         } else {
           setHasImage(false);
-          setIsImageLoading(false); // Stop loading if no image exists
+          setIsImageLoading(false);
         }
       } catch {
         setHasImage(false);
-        setIsImageLoading(false); // Stop loading on error
+        setIsImageLoading(false);
       }
     };
     checkImage();
 
-    // Cleanup function to reset loading state when component unmounts or moonNumber changes
     return () => {
       setIsImageLoading(false);
     };
-  }, [moonNumber, imageKey, nextMooniversaryNumber]);
+  }, [moonNumber, thumbnailUrl, nextMooniversaryNumber]);
 
-  // Add error handler for image load failures
   const handleImageError = () => {
     setIsImageLoading(false);
     setHasImage(false);
   };
 
-  // Add image load success handler
   const handleImageLoad = () => {
     setIsImageLoading(false);
   };

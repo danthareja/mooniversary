@@ -4,8 +4,8 @@ import { add, parseISO } from "date-fns";
 export const FIRST_DATE = parseISO("2021-04-25T14:00-0600");
 
 export function getNextMooniversaryDate() {
-  const today = new Date();
-  const nextMonth = add(new Date(), { days: 31 });
+  const today = getToday();
+  const nextMonth = add(today, { days: 31 });
 
   const [nextMooniversary] = lune.phase_range(
     today,
@@ -28,7 +28,7 @@ export function getNextMooniversaryNumber() {
 }
 
 export function getPastMooniversaryDates() {
-  const today = new Date();
+  const today = getToday();
 
   const [, ...pastMooniversaries] = lune.phase_range(
     FIRST_DATE,
@@ -44,7 +44,7 @@ export function findMooniversaryDate(number: number) {
     throw new Error(`Exepcted '${number}' to be a number greater than 0`);
   }
 
-  const targetDate = add(new Date(), { months: number });
+  const targetDate = add(getToday(), { months: number });
 
   const [, ...mooniversaries] = lune.phase_range(
     FIRST_DATE,
@@ -59,4 +59,10 @@ export function findMooniversaryDate(number: number) {
   }
 
   return mooniversaries[number - 1];
+}
+
+export function getToday() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return today;
 }

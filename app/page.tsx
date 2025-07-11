@@ -75,7 +75,7 @@ export default function Home() {
                 onClick={() => setMooniversaryNumber(nextMooniversaryNumber)}
                 className="fixed left-4 top-1/2 translate-y-8 border border-white/20 text-white hover:bg-white/10 hover:border-white/40 text-xs p-2 h-10 w-12 z-10"
               >
-                Today
+                Now
               </Button>
             )}
 
@@ -105,7 +105,7 @@ export default function Home() {
                 onClick={() => setMooniversaryNumber(nextMooniversaryNumber)}
                 className="fixed right-4 top-1/2 translate-y-8 border border-white/20 text-white hover:bg-white/10 hover:border-white/40 text-xs p-2 h-10 w-12 z-10"
               >
-                Today
+                Now
               </Button>
             )}
 
