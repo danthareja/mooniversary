@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
 
     if (password !== APP_SECRET_KEY) {
       return NextResponse.json(
-        { error: "lol did you forgot the password" },
+        { error: "lol did you forget the password" },
         { status: 401 },
       );
     }
