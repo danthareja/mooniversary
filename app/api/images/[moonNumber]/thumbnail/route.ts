@@ -26,8 +26,10 @@ export async function GET(
 ) {
   try {
     const { moonNumber } = await params;
+    const { searchParams } = new URL(request.url);
+    const imageId = searchParams.get("id");
 
-    if (!moonNumber) {
+    if (!moonNumber || !imageId) {
       return new NextResponse(createTransparentPixel(), {
         status: 400,
         headers: {
@@ -37,7 +39,7 @@ export async function GET(
       });
     }
 
-    const key = `moon-${moonNumber}-thumbnail.jpg`;
+    const key = `moons/${moonNumber}/${imageId}.thumbnail.jpg`;
 
     const command = new GetObjectCommand({
       Bucket: BUCKET_NAME,
@@ -72,7 +74,13 @@ export async function GET(
 
     return new NextResponse(buffer, { headers });
   } catch (error) {
-    if (error instanceof Error && error.name === "NoSuchKey") {
+    type MaybeHttpStatus = { $metadata?: { httpStatusCode?: number } };
+    const httpStatusCode = (error as unknown as MaybeHttpStatus).$metadata
+      ?.httpStatusCode;
+    const isNotFound =
+      error instanceof Error &&
+      (error.name === "NoSuchKey" || httpStatusCode === 404);
+    if (isNotFound) {
       return new NextResponse(createTransparentPixel(), {
         status: 404,
         headers: {

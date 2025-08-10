@@ -7,7 +7,6 @@ import { MoonSlider } from "@/components/moon-slider";
 import { EditText } from "@/components/edit-text";
 import { MoonImage } from "@/components/moon-image";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function Home() {
   const {
@@ -64,10 +63,9 @@ export default function Home() {
                 setMooniversaryNumber(Math.max(1, mooniversaryNumber - 1))
               }
               disabled={mooniversaryNumber <= 1}
-              className="fixed left-4 top-1/2 -translate-y-1/2 border border-white/20 text-white hover:bg-white/10 hover:border-white/40 disabled:opacity-30 disabled:cursor-not-allowed p-2 h-10 w-12 z-10"
-              aria-label="Previous moon"
+              className="fixed left-4 top-1/2 -translate-y-1/2 border border-white/20 text-white hover:bg-white/10 hover:border-white/40 disabled:opacity-30 disabled:cursor-not-allowed p-2 h-10 w-12 z-10 text-xs"
             >
-              <ChevronLeft className="h-5 w-5" />
+              Prev
             </Button>
 
             {mooniversaryNumber > nextMooniversaryNumber && (
@@ -94,10 +92,9 @@ export default function Home() {
                 setMooniversaryNumber(Math.min(999, mooniversaryNumber + 1))
               }
               disabled={mooniversaryNumber >= 999}
-              className="fixed right-4 top-1/2 -translate-y-1/2 border border-white/20 text-white hover:bg-white/10 hover:border-white/40 disabled:opacity-30 disabled:cursor-not-allowed p-2 h-10 w-12 z-10"
-              aria-label="Next moon"
+              className="fixed right-4 top-1/2 -translate-y-1/2 border border-white/20 text-white hover:bg-white/10 hover:border-white/40 disabled:opacity-30 disabled:cursor-not-allowed p-2 h-10 w-12 z-10 text-xs"
             >
-              <ChevronRight className="h-5 w-5" />
+              Next
             </Button>
 
             {mooniversaryNumber < nextMooniversaryNumber && (

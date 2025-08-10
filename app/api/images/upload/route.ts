@@ -21,10 +21,11 @@ export async function POST(request: NextRequest) {
     const file = formData.get("image") as File;
     const password = formData.get("password") as string;
     const moonNumber = formData.get("moonNumber") as string;
+    const imageIdFromClient = (formData.get("imageId") as string) || null;
 
     if (password !== APP_SECRET_KEY) {
       return NextResponse.json(
-        { error: "lol did you forget the password" },
+        { error: "lol did you forget the password again" },
         { status: 401 },
       );
     }
@@ -78,8 +79,11 @@ export async function POST(request: NextRequest) {
       .jpeg({ quality: 80 })
       .toBuffer();
 
-    // Upload original image to S3
-    const originalKey = `moon-${moonNumber}.jpg`;
+    // Choose an image id: either provided or timestamp-based
+    const imageId = imageIdFromClient || `${Date.now()}`;
+
+    // Upload original image to S3 at per-moon folder
+    const originalKey = `moons/${moonNumber}/${imageId}.jpg`;
     await s3Client.send(
       new PutObjectCommand({
         Bucket: BUCKET_NAME,
@@ -89,8 +93,8 @@ export async function POST(request: NextRequest) {
       }),
     );
 
-    // Upload thumbnail to S3
-    const thumbnailKey = `moon-${moonNumber}-thumbnail.jpg`;
+    // Upload thumbnail to S3 alongside original
+    const thumbnailKey = `moons/${moonNumber}/${imageId}.thumbnail.jpg`;
     await s3Client.send(
       new PutObjectCommand({
         Bucket: BUCKET_NAME,
@@ -104,6 +108,7 @@ export async function POST(request: NextRequest) {
       success: true,
       message: "Image uploaded successfully",
       moonNumber,
+      imageId,
     });
   } catch (error) {
     console.error("Upload error:", error);

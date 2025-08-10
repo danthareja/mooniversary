@@ -13,6 +13,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Timer, Upload, X } from "lucide-react";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+  type CarouselApi,
+} from "@/components/ui/carousel";
 
 interface MoonImageProps {
   moonNumber: number;
@@ -23,7 +31,8 @@ export function MoonImage({
   moonNumber,
   nextMooniversaryNumber,
 }: MoonImageProps) {
-  const [hasImage, setHasImage] = React.useState<boolean | null>(null);
+  const [images, setImages] = React.useState<string[]>([]);
+  const hasImage = images.length > 0;
   const [showUpload, setShowUpload] = React.useState(false);
   const [password, setPassword] = React.useState("");
   const [file, setFile] = React.useState<File | null>(null);
@@ -31,45 +40,56 @@ export function MoonImage({
   const [error, setError] = React.useState<string | null>(null);
   const [imageKey, setImageKey] = React.useState(0);
   const [isImageLoading, setIsImageLoading] = React.useState(false);
+  const [currentIndex, setCurrentIndex] = React.useState(0);
 
-  const thumbnailUrl = `/api/images/${moonNumber}/thumbnail?v=${imageKey}`;
-  const fullImageUrl = `/api/images/${moonNumber}?v=${imageKey}`;
+  const [carouselApi, setCarouselApi] = React.useState<CarouselApi | undefined>(
+    undefined,
+  );
+
+  const currentImageId = images[currentIndex];
+  // URLs are now generated inline per-slide
 
   const isUploadAllowed = moonNumber <= nextMooniversaryNumber;
 
+  const refreshImages = React.useCallback(async () => {
+    if (moonNumber > nextMooniversaryNumber) {
+      setImages([]);
+      setIsImageLoading(false);
+      return;
+    }
+    try {
+      const res = await fetch(`/api/images/${moonNumber}/list?v=${imageKey}`);
+      const data = await res.json();
+      const list: string[] = Array.isArray(data.images) ? data.images : [];
+      setImages(list);
+      setCurrentIndex((prev) =>
+        list.length === 0 ? 0 : Math.min(prev, list.length - 1),
+      );
+    } catch {
+      setImages([]);
+    } finally {
+      setIsImageLoading(false);
+    }
+  }, [moonNumber, nextMooniversaryNumber, imageKey]);
+
   React.useEffect(() => {
-    const checkImage = async () => {
-      if (moonNumber > nextMooniversaryNumber) {
-        setHasImage(false);
-        setIsImageLoading(false);
-        return;
-      }
-
-      setIsImageLoading(true);
-      try {
-        const response = await fetch(thumbnailUrl);
-
-        if (response.ok) {
-          setHasImage(true);
-        } else {
-          setHasImage(false);
-          setIsImageLoading(false);
-        }
-      } catch {
-        setHasImage(false);
-        setIsImageLoading(false);
-      }
-    };
-    checkImage();
-
+    setIsImageLoading(true);
+    refreshImages();
     return () => {
       setIsImageLoading(false);
     };
-  }, [moonNumber, thumbnailUrl, nextMooniversaryNumber]);
+  }, [refreshImages]);
+
+  React.useEffect(() => {
+    if (!carouselApi) return;
+    setCurrentIndex(carouselApi.selectedScrollSnap());
+    const onSelect = () => setCurrentIndex(carouselApi.selectedScrollSnap());
+    carouselApi.on("select", onSelect);
+    // No off() in our wrapper; safe to ignore cleanup on unmount
+  }, [carouselApi]);
 
   const handleImageError = () => {
     setIsImageLoading(false);
-    setHasImage(false);
   };
 
   const handleImageLoad = () => {
@@ -126,7 +146,7 @@ export function MoonImage({
       }
 
       setImageKey((prev) => prev + 1);
-      setHasImage(true);
+      await refreshImages();
       setShowUpload(false);
       setFile(null);
       setPassword("");
@@ -145,7 +165,7 @@ export function MoonImage({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && file && password && !isUploading) {
+    if (e.key === "Enter" && showUpload && file && password && !isUploading) {
       handleUpload();
     }
   };
@@ -166,7 +186,7 @@ export function MoonImage({
                     Image for Moon {moonNumber}
                   </DialogTitle>
                   <DialogTrigger asChild>
-                    <div className="w-full h-full cursor-pointer border border-white/20 rounded-lg overflow-hidden hover:border-white/40 transition-colors">
+                    <div className="group w-full h-full cursor-pointer border border-white/20 rounded-lg overflow-hidden hover:border-white/40 transition-colors relative focus:outline-none focus:ring-1 focus:ring-white/30">
                       {isImageLoading && (
                         <div className="absolute inset-0 flex items-center justify-center bg-black/40 z-10">
                           <svg
@@ -191,22 +211,57 @@ export function MoonImage({
                           </svg>
                         </div>
                       )}
-                      <Image
-                        key={imageKey}
-                        src={thumbnailUrl}
-                        alt={`Moon ${moonNumber}`}
-                        width={200}
-                        height={200}
-                        className="object-cover w-full h-full"
-                        style={{
-                          maxWidth: "100%",
-                          height: "auto",
-                        }}
-                        unoptimized
-                        onLoad={handleImageLoad}
-                        loading="eager"
-                        onError={handleImageError}
-                      />
+                      <Carousel
+                        setApi={setCarouselApi}
+                        className="w-[200px] h-[200px]"
+                      >
+                        <CarouselContent className="-ml-0">
+                          {images.map((id) => (
+                            <CarouselItem
+                              key={`${id}-${imageKey}`}
+                              className="pl-0"
+                            >
+                              <div
+                                tabIndex={0}
+                                className="relative h-[200px] w-[200px] outline-none"
+                              >
+                                <Image
+                                  src={`/api/images/${moonNumber}/thumbnail?id=${id}&v=${imageKey}`}
+                                  alt={`Moon ${moonNumber}`}
+                                  width={200}
+                                  height={200}
+                                  className="object-cover w-full h-full"
+                                  unoptimized
+                                  loading="eager"
+                                  onLoad={handleImageLoad}
+                                  onError={handleImageError}
+                                />
+                              </div>
+                            </CarouselItem>
+                          ))}
+                        </CarouselContent>
+                        {images.length > 1 && (
+                          <>
+                            <CarouselPrevious className="left-1 top-1/2 -translate-y-1/2" />
+                            <CarouselNext className="right-1 top-1/2 -translate-y-1/2" />
+                            <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1">
+                              {images.map((_, idx) => (
+                                <button
+                                  key={idx}
+                                  type="button"
+                                  aria-label={`Go to image ${idx + 1}`}
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    carouselApi?.scrollTo(idx);
+                                  }}
+                                  className={`h-1.5 w-1.5 rounded-full ${idx === currentIndex ? "bg-white" : "bg-white/50"} shadow-sm`}
+                                />
+                              ))}
+                            </div>
+                          </>
+                        )}
+                      </Carousel>
                     </div>
                   </DialogTrigger>
                   <DialogContent
@@ -217,21 +272,23 @@ export function MoonImage({
                       Image for Moon {moonNumber}
                     </DialogDescription>
                     <div className="relative">
-                      <Image
-                        src={fullImageUrl}
-                        alt={`Moon ${moonNumber} full`}
-                        width={1200}
-                        height={1200}
-                        className="w-full h-auto object-contain rounded-lg"
-                        style={{
-                          maxWidth: "100%",
-                          height: "auto",
-                        }}
-                        unoptimized
-                        loading="eager"
-                      />
+                      {currentImageId && (
+                        <Image
+                          src={`/api/images/${moonNumber}?id=${currentImageId}&v=${imageKey}`}
+                          alt={`Moon ${moonNumber} full`}
+                          width={1200}
+                          height={1200}
+                          className="w-full h-auto object-contain rounded-lg"
+                          style={{
+                            maxWidth: "100%",
+                            height: "auto",
+                          }}
+                          unoptimized
+                          loading="eager"
+                        />
+                      )}
                       <DialogClose asChild>
-                        <Button className="absolute top-4 right-4 bg-black/70 hover:bg-black/90 border border-white/30 text-white rounded-full p-2 h-auto w-auto backdrop-blur-sm">
+                        <Button className="absolute top-4 right-4 size-6 rounded-full bg-white/80 hover:bg-white text-black shadow-none focus:outline-none focus:ring-0">
                           <X className="h-5 w-5" />
                         </Button>
                       </DialogClose>
@@ -282,14 +339,18 @@ export function MoonImage({
               )}
             </div>
 
-            <Button
-              onClick={() => setShowUpload(true)}
-              disabled={!isUploadAllowed}
-              className="border border-white/20 text-white hover:bg-white/10 hover:border-white/40 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <Upload className="h-4 w-4 mr-2" />
-              {hasImage ? "Replace cute pic" : "Add cute pic"}
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={() => {
+                  setShowUpload(true);
+                }}
+                disabled={!isUploadAllowed}
+                className="border border-white/20 text-white hover:bg-white/10 hover:border-white/40 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Upload className="h-4 w-4 mr-2" />
+                Add cute pic
+              </Button>
+            </div>
           </div>
         ) : (
           <div className="border border-white/20 rounded-lg p-3 space-y-2 w-full max-w-[280px]">
