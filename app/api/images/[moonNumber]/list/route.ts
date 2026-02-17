@@ -23,13 +23,24 @@ export async function GET(
     }
 
     const prefix = `moons/${moonNumber}/`;
-    const command = new ListObjectsV2Command({
-      Bucket: BUCKET_NAME,
-      Prefix: prefix,
-    });
-    const response = await s3Client.send(command);
+    const allContents: { Key?: string }[] = [];
+    let continuationToken: string | undefined;
 
-    const keys = (response.Contents || [])
+    do {
+      const command = new ListObjectsV2Command({
+        Bucket: BUCKET_NAME,
+        Prefix: prefix,
+        MaxKeys: 100,
+        ContinuationToken: continuationToken,
+      });
+      const response = await s3Client.send(command);
+      allContents.push(...(response.Contents || []));
+      continuationToken = response.IsTruncated
+        ? response.NextContinuationToken
+        : undefined;
+    } while (continuationToken);
+
+    const keys = allContents
       .map((o) => o.Key)
       .filter((k): k is string => Boolean(k))
       .filter((k) => k.endsWith(".jpg"))

@@ -15,6 +15,12 @@ const s3Client = new S3Client({
 const BUCKET_NAME = process.env.AWS_S3_BUCKET_NAME!;
 const APP_SECRET_KEY = process.env.APP_SECRET_KEY!;
 
+const FULL_IMAGE_SIZE = 1200;
+const THUMBNAIL_SIZE = 400;
+const FULL_IMAGE_QUALITY = 90;
+const THUMBNAIL_QUALITY = 80;
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
@@ -33,6 +39,20 @@ export async function POST(request: NextRequest) {
     if (!file) {
       return NextResponse.json(
         { error: "No cute pic provided" },
+        { status: 400 },
+      );
+    }
+
+    if (!file.type.startsWith("image/")) {
+      return NextResponse.json(
+        { error: "File must be an image" },
+        { status: 400 },
+      );
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+      return NextResponse.json(
+        { error: "File must be less than 10MB" },
         { status: 400 },
       );
     }
@@ -57,26 +77,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!file.type.startsWith("image/")) {
-      return NextResponse.json(
-        { error: "File must be an image" },
-        { status: 400 },
-      );
-    }
-
     const buffer = Buffer.from(await file.arrayBuffer());
 
     const processedImage = await sharp(buffer)
       .rotate() // Auto-rotate based on EXIF orientation
-      .resize(1200, 1200, { fit: "inside", withoutEnlargement: true })
-      .jpeg({ quality: 90 })
+      .resize(FULL_IMAGE_SIZE, FULL_IMAGE_SIZE, {
+        fit: "inside",
+        withoutEnlargement: true,
+      })
+      .jpeg({ quality: FULL_IMAGE_QUALITY })
       .toBuffer();
 
     // Create thumbnail
     const thumbnail = await sharp(buffer)
       .rotate() // Auto-rotate based on EXIF orientation
-      .resize(400, 400, { fit: "cover" })
-      .jpeg({ quality: 80 })
+      .resize(THUMBNAIL_SIZE, THUMBNAIL_SIZE, { fit: "cover" })
+      .jpeg({ quality: THUMBNAIL_QUALITY })
       .toBuffer();
 
     // Choose an image id: either provided or timestamp-based

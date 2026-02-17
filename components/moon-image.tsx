@@ -22,6 +22,10 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel";
 
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
+const imageListCache = new Map<string, string[]>();
+
 interface MoonImageProps {
   moonNumber: number;
   nextMooniversaryNumber: number;
@@ -53,6 +57,21 @@ export function MoonImage({
 
   const isUploadAllowed = moonNumber <= nextMooniversaryNumber;
 
+  const fetchImageList = React.useCallback(
+    async (moon: number): Promise<string[]> => {
+      const cacheKey = `${moon}:${imageKey}`;
+      const cached = imageListCache.get(cacheKey);
+      if (cached) return cached;
+
+      const res = await fetch(`/api/images/${moon}/list?v=${imageKey}`);
+      const data = await res.json();
+      const list: string[] = Array.isArray(data.images) ? data.images : [];
+      imageListCache.set(cacheKey, list);
+      return list;
+    },
+    [imageKey],
+  );
+
   const refreshImages = React.useCallback(async () => {
     if (moonNumber > nextMooniversaryNumber) {
       setImages([]);
@@ -60,9 +79,7 @@ export function MoonImage({
       return;
     }
     try {
-      const res = await fetch(`/api/images/${moonNumber}/list?v=${imageKey}`);
-      const data = await res.json();
-      const list: string[] = Array.isArray(data.images) ? data.images : [];
+      const list = await fetchImageList(moonNumber);
       setImages(list);
       setCurrentIndex((prev) =>
         list.length === 0 ? 0 : Math.min(prev, list.length - 1),
@@ -72,7 +89,7 @@ export function MoonImage({
     } finally {
       setIsImageLoading(false);
     }
-  }, [moonNumber, nextMooniversaryNumber, imageKey]);
+  }, [moonNumber, nextMooniversaryNumber, fetchImageList]);
 
   React.useEffect(() => {
     setIsImageLoading(true);
@@ -81,6 +98,25 @@ export function MoonImage({
       setIsImageLoading(false);
     };
   }, [refreshImages]);
+
+  // Preload adjacent mooniversary image lists and thumbnails
+  React.useEffect(() => {
+    const adjacent = [moonNumber - 1, moonNumber + 1].filter(
+      (n) => n >= 1 && n <= nextMooniversaryNumber,
+    );
+    adjacent.forEach(async (n) => {
+      try {
+        const list = await fetchImageList(n);
+        // Preload thumbnail images into browser cache
+        list.forEach((id) => {
+          const img = new window.Image();
+          img.src = `/api/images/${n}/thumbnail?id=${id}&v=${imageKey}`;
+        });
+      } catch {
+        // Preloading is best-effort
+      }
+    });
+  }, [moonNumber, nextMooniversaryNumber, fetchImageList, imageKey]);
 
   React.useEffect(() => {
     if (!carouselApi) return;
@@ -128,7 +164,7 @@ export function MoonImage({
         setError("Please select an image file");
         return;
       }
-      if (selectedFile.size > 10 * 1024 * 1024) {
+      if (selectedFile.size > MAX_FILE_SIZE) {
         setError("File must be less than 10MB");
         return;
       }
@@ -170,8 +206,8 @@ export function MoonImage({
         throw new Error(result.error || "Upload failed");
       }
 
+      imageListCache.delete(`${moonNumber}:${imageKey}`);
       setImageKey((prev) => prev + 1);
-      await refreshImages();
       setShowUpload(false);
       setFile(null);
       setPassword("");
