@@ -125,6 +125,7 @@ export function MoonSliderBall({
   isComplete,
 }: MoonSliderBallProps) {
   const ballRef = React.useRef<HTMLDivElement>(null);
+  const snappedRef = React.useRef(false);
   const [position, setPosition] = React.useState({ x: 0, y: 0 });
 
   // Initialize ball location
@@ -139,7 +140,10 @@ export function MoonSliderBall({
   // Snap to center of basket once within threshold
   React.useEffect(() => {
     if (isComplete) {
-      setPosition({ x: basket.x - ball.x, y: basket.y - ball.y });
+      setPosition({
+        x: basket.x + basket.width / 2 - (ball.x + ball.width / 2),
+        y: basket.y + basket.height / 2 - (ball.y + ball.height / 2),
+      });
     }
   }, [isComplete, basket.x, ball.x, basket.y, ball.y]);
 
@@ -152,6 +156,7 @@ export function MoonSliderBall({
   };
 
   const handleDrag = (_: DraggableEvent, data: DraggableData) => {
+    if (snappedRef.current) return false;
     const ballRect = data.node.getBoundingClientRect();
     if (
       Math.abs(ballRect.top - basket.top) < threshold &&
@@ -159,6 +164,16 @@ export function MoonSliderBall({
       Math.abs(ballRect.bottom - basket.bottom) < threshold &&
       Math.abs(ballRect.right - basket.right) < threshold
     ) {
+      // Snap to basket center immediately so there's no off-center frame during fade-out
+      snappedRef.current = true;
+      setPosition({
+        x:
+          data.x +
+          (basket.x + basket.width / 2 - (ballRect.x + ballRect.width / 2)),
+        y:
+          data.y +
+          (basket.y + basket.height / 2 - (ballRect.y + ballRect.height / 2)),
+      });
       onComplete();
       return false;
     } else {

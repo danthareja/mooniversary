@@ -45,6 +45,7 @@ export function MoonImage({
   const [imageKey, setImageKey] = React.useState(0);
   const [isImageLoading, setIsImageLoading] = React.useState(false);
   const [currentIndex, setCurrentIndex] = React.useState(0);
+  const [dialogOpen, setDialogOpen] = React.useState(false);
 
   const [carouselApi, setCarouselApi] = React.useState<CarouselApi | undefined>(
     undefined,
@@ -130,15 +131,19 @@ export function MoonImage({
 
   const scrollContainerRef = React.useRef<HTMLDivElement>(null);
 
-  // Scroll to the correct image when dialog opens or currentIndex changes externally
+  // Scroll to the correct image when dialog opens, then enable snap
   React.useEffect(() => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
-    const targetScroll = currentIndex * container.clientWidth;
-    if (Math.abs(container.scrollLeft - targetScroll) > 1) {
-      container.scrollTo({ left: targetScroll, behavior: "instant" });
-    }
-  }, [currentIndex, images]);
+    if (!dialogOpen) return;
+    const raf = requestAnimationFrame(() => {
+      const container = scrollContainerRef.current;
+      if (!container) return;
+      container.scrollLeft = currentIndex * container.clientWidth;
+      requestAnimationFrame(() => {
+        container.style.scrollSnapType = "x mandatory";
+      });
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [dialogOpen, currentIndex, images]);
 
   const handleImageError = () => {
     setIsImageLoading(false);
@@ -232,7 +237,7 @@ export function MoonImage({
           <div className="flex flex-col items-center space-y-4">
             <div className="w-[200px] h-[200px] relative">
               {hasImage ? (
-                <Dialog>
+                <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                   <DialogTitle className="sr-only">
                     Image for Moon {moonNumber}
                   </DialogTitle>
@@ -293,8 +298,8 @@ export function MoonImage({
                         </CarouselContent>
                         {images.length > 1 && (
                           <>
-                            <CarouselPrevious className="left-1 top-1/2 -translate-y-1/2" />
-                            <CarouselNext className="right-1 top-1/2 -translate-y-1/2" />
+                            <CarouselPrevious className="left-1 top-1/2 -translate-y-1/2 hidden sm:inline-flex" />
+                            <CarouselNext className="right-1 top-1/2 -translate-y-1/2 hidden sm:inline-flex" />
                             <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-2">
                               {images.map((_, idx) => (
                                 <button
@@ -327,7 +332,6 @@ export function MoonImage({
                         ref={scrollContainerRef}
                         className="flex overflow-x-auto hide-scrollbar"
                         style={{
-                          scrollSnapType: "x mandatory",
                           WebkitOverflowScrolling: "touch",
                           scrollbarWidth: "none",
                           msOverflowStyle: "none",
