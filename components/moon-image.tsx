@@ -45,9 +45,11 @@ export function MoonImage({
   const [carouselApi, setCarouselApi] = React.useState<CarouselApi | undefined>(
     undefined,
   );
+  const [expandedCarouselApi, setExpandedCarouselApi] = React.useState<
+    CarouselApi | undefined
+  >(undefined);
 
-  const currentImageId = images[currentIndex];
-  // URLs are now generated inline per-slide
+  // currentIndex is used to sync between thumbnail and expanded carousels
 
   const isUploadAllowed = moonNumber <= nextMooniversaryNumber;
 
@@ -85,8 +87,22 @@ export function MoonImage({
     setCurrentIndex(carouselApi.selectedScrollSnap());
     const onSelect = () => setCurrentIndex(carouselApi.selectedScrollSnap());
     carouselApi.on("select", onSelect);
-    // No off() in our wrapper; safe to ignore cleanup on unmount
   }, [carouselApi]);
+
+  // Sync expanded carousel selection back to currentIndex
+  React.useEffect(() => {
+    if (!expandedCarouselApi) return;
+    const onSelect = () =>
+      setCurrentIndex(expandedCarouselApi.selectedScrollSnap());
+    expandedCarouselApi.on("select", onSelect);
+  }, [expandedCarouselApi]);
+
+  // Keep thumbnail carousel in sync when currentIndex changes (e.g. from expanded view)
+  React.useEffect(() => {
+    if (carouselApi && carouselApi.selectedScrollSnap() !== currentIndex) {
+      carouselApi.scrollTo(currentIndex);
+    }
+  }, [carouselApi, currentIndex]);
 
   const handleImageError = () => {
     setIsImageLoading(false);
@@ -243,7 +259,7 @@ export function MoonImage({
                           <>
                             <CarouselPrevious className="left-1 top-1/2 -translate-y-1/2" />
                             <CarouselNext className="right-1 top-1/2 -translate-y-1/2" />
-                            <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1">
+                            <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-2">
                               {images.map((_, idx) => (
                                 <button
                                   key={idx}
@@ -254,7 +270,7 @@ export function MoonImage({
                                     e.stopPropagation();
                                     carouselApi?.scrollTo(idx);
                                   }}
-                                  className={`h-1.5 w-1.5 rounded-full ${idx === currentIndex ? "bg-white" : "bg-white/50"} shadow-sm`}
+                                  className={`h-2.5 w-2.5 rounded-full ${idx === currentIndex ? "bg-white" : "bg-white/50"} shadow-sm`}
                                 />
                               ))}
                             </div>
@@ -271,23 +287,54 @@ export function MoonImage({
                       Image for Moon {moonNumber}
                     </DialogDescription>
                     <div className="relative">
-                      {currentImageId && (
-                        <Image
-                          src={`/api/images/${moonNumber}?id=${currentImageId}&v=${imageKey}`}
-                          alt={`Moon ${moonNumber} full`}
-                          width={1200}
-                          height={1200}
-                          className="w-full h-auto object-contain rounded-lg"
-                          style={{
-                            maxWidth: "100%",
-                            height: "auto",
-                          }}
-                          unoptimized
-                          loading="eager"
-                        />
-                      )}
+                      <Carousel
+                        setApi={setExpandedCarouselApi}
+                        opts={{ startIndex: currentIndex }}
+                      >
+                        <CarouselContent className="-ml-0">
+                          {images.map((id) => (
+                            <CarouselItem
+                              key={`expanded-${id}-${imageKey}`}
+                              className="pl-0"
+                            >
+                              <Image
+                                src={`/api/images/${moonNumber}?id=${id}&v=${imageKey}`}
+                                alt={`Moon ${moonNumber} full`}
+                                width={1200}
+                                height={1200}
+                                className="w-full h-auto object-contain rounded-lg"
+                                style={{
+                                  maxWidth: "100%",
+                                  height: "auto",
+                                }}
+                                unoptimized
+                                loading="eager"
+                              />
+                            </CarouselItem>
+                          ))}
+                        </CarouselContent>
+                        {images.length > 1 && (
+                          <>
+                            <CarouselPrevious className="left-2 top-1/2 -translate-y-1/2" />
+                            <CarouselNext className="right-2 top-1/2 -translate-y-1/2" />
+                            <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
+                              {images.map((_, idx) => (
+                                <button
+                                  key={idx}
+                                  type="button"
+                                  aria-label={`Go to image ${idx + 1}`}
+                                  onClick={() =>
+                                    expandedCarouselApi?.scrollTo(idx)
+                                  }
+                                  className={`h-2.5 w-2.5 rounded-full ${idx === currentIndex ? "bg-white" : "bg-white/50"} shadow-sm`}
+                                />
+                              ))}
+                            </div>
+                          </>
+                        )}
+                      </Carousel>
                       <DialogClose asChild>
-                        <Button className="absolute top-4 right-4 size-6 rounded-full bg-white/80 hover:bg-white text-black shadow-none focus:outline-none focus:ring-0">
+                        <Button className="absolute top-4 right-4 size-8 rounded-full bg-white/80 hover:bg-white text-black shadow-none focus:outline-none focus:ring-0">
                           <X className="h-5 w-5" />
                         </Button>
                       </DialogClose>

@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useSwipeable } from "react-swipeable";
 import { useMooniversary } from "@/hooks/mooniversary";
 import { Background } from "@/components/background";
 import { MoonSlider } from "@/components/moon-slider";
@@ -18,11 +19,22 @@ export default function Home() {
     nextMooniversaryNumber,
   } = useMooniversary();
 
+  const swipeHandlers = useSwipeable({
+    onSwipedLeft: () =>
+      setMooniversaryNumber(Math.min(999, mooniversaryNumber + 1)),
+    onSwipedRight: () =>
+      setMooniversaryNumber(Math.max(1, mooniversaryNumber - 1)),
+    preventScrollOnSwipe: true,
+  });
+
   return (
     <>
       <Background />
       <MoonSlider>
-        <div className="h-full w-full flex flex-col justify-center items-center overflow-hidden">
+        <div
+          className="h-full w-full flex flex-col justify-center items-center overflow-hidden"
+          {...swipeHandlers}
+        >
           <main
             className="flex flex-col items-center space-y-6 py-4 px-4 w-full max-w-2xl"
             data-test="next-mooniversary"
@@ -63,7 +75,7 @@ export default function Home() {
                 setMooniversaryNumber(Math.max(1, mooniversaryNumber - 1))
               }
               disabled={mooniversaryNumber <= 1}
-              className="fixed left-4 top-1/2 -translate-y-1/2 border border-white/20 text-white hover:bg-white/10 hover:border-white/40 disabled:opacity-30 disabled:cursor-not-allowed p-2 h-10 w-12 z-10 text-xs"
+              className="hidden sm:block fixed left-4 top-1/2 -translate-y-1/2 border border-white/20 text-white hover:bg-white/10 hover:border-white/40 disabled:opacity-30 disabled:cursor-not-allowed p-2 h-10 w-12 z-10 text-xs"
             >
               Prev
             </Button>
@@ -71,7 +83,7 @@ export default function Home() {
             {mooniversaryNumber > nextMooniversaryNumber && (
               <Button
                 onClick={() => setMooniversaryNumber(nextMooniversaryNumber)}
-                className="fixed left-4 top-1/2 translate-y-8 border border-white/20 text-white hover:bg-white/10 hover:border-white/40 text-xs p-2 h-10 w-12 z-10"
+                className="hidden sm:block fixed left-4 top-1/2 translate-y-8 border border-white/20 text-white hover:bg-white/10 hover:border-white/40 text-xs p-2 h-10 w-12 z-10"
               >
                 Now
               </Button>
@@ -81,7 +93,7 @@ export default function Home() {
               mooniversaryNumber <= nextMooniversaryNumber && (
                 <Button
                   onClick={() => setMooniversaryNumber(1)}
-                  className="fixed left-4 top-1/2 translate-y-8 border border-white/20 text-white hover:bg-white/10 hover:border-white/40 text-xs p-2 h-10 w-12 z-10"
+                  className="hidden sm:block fixed left-4 top-1/2 translate-y-8 border border-white/20 text-white hover:bg-white/10 hover:border-white/40 text-xs p-2 h-10 w-12 z-10"
                 >
                   First
                 </Button>
@@ -92,7 +104,7 @@ export default function Home() {
                 setMooniversaryNumber(Math.min(999, mooniversaryNumber + 1))
               }
               disabled={mooniversaryNumber >= 999}
-              className="fixed right-4 top-1/2 -translate-y-1/2 border border-white/20 text-white hover:bg-white/10 hover:border-white/40 disabled:opacity-30 disabled:cursor-not-allowed p-2 h-10 w-12 z-10 text-xs"
+              className="hidden sm:block fixed right-4 top-1/2 -translate-y-1/2 border border-white/20 text-white hover:bg-white/10 hover:border-white/40 disabled:opacity-30 disabled:cursor-not-allowed p-2 h-10 w-12 z-10 text-xs"
             >
               Next
             </Button>
@@ -100,7 +112,7 @@ export default function Home() {
             {mooniversaryNumber < nextMooniversaryNumber && (
               <Button
                 onClick={() => setMooniversaryNumber(nextMooniversaryNumber)}
-                className="fixed right-4 top-1/2 translate-y-8 border border-white/20 text-white hover:bg-white/10 hover:border-white/40 text-xs p-2 h-10 w-12 z-10"
+                className="hidden sm:block fixed right-4 top-1/2 translate-y-8 border border-white/20 text-white hover:bg-white/10 hover:border-white/40 text-xs p-2 h-10 w-12 z-10"
               >
                 Now
               </Button>
