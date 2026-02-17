@@ -164,10 +164,9 @@ export function MoonImage({
     setError(null);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && showUpload && file && password && !isUploading) {
-      handleUpload();
-    }
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleUpload();
   };
 
   React.useEffect(() => {
@@ -353,10 +352,15 @@ export function MoonImage({
             </div>
           </div>
         ) : (
-          <div className="border border-white/20 rounded-lg p-3 space-y-2 w-full max-w-[280px]">
+          <form
+            noValidate
+            onSubmit={handleSubmit}
+            className="border border-white/20 rounded-lg p-3 space-y-2 w-full max-w-[280px]"
+          >
             <div className="flex justify-between items-center">
               <span className="text-white/90 text-sm">Upload cute pic</span>
               <Button
+                type="button"
                 onClick={resetUpload}
                 className="border-none text-white/60 hover:text-white p-1 h-auto"
               >
@@ -369,7 +373,6 @@ export function MoonImage({
                 type="file"
                 accept="image/*"
                 onChange={handleFileSelect}
-                onKeyDown={handleKeyDown}
                 className="border-white/20 text-white file:border-0 file:text-white/70 focus:border-white/40 text-xs h-8"
               />
               {file && (
@@ -382,20 +385,19 @@ export function MoonImage({
               placeholder="Super secret password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              onKeyDown={handleKeyDown}
               className="border-white/20 text-white placeholder:text-white/50 focus:border-white/40 text-sm h-8"
             />
 
             {error && <p className="text-red-400 text-xs">{error}</p>}
 
             <Button
-              onClick={handleUpload}
+              type="submit"
               disabled={!file || !password || isUploading}
               className="w-full border border-white/20 text-white hover:bg-white/10 hover:border-white/40 disabled:opacity-50 text-sm h-8"
             >
               {isUploading ? "Sending..." : "Send it to the moon"}
             </Button>
-          </div>
+          </form>
         )}
       </div>
     </div>
