@@ -95,6 +95,15 @@ export function MoonImage({
     const onSelect = () =>
       setCurrentIndex(expandedCarouselApi.selectedScrollSnap());
     expandedCarouselApi.on("select", onSelect);
+    // ReInit after dialog open animation completes so Embla measures correct dimensions
+    const dialog = expandedCarouselApi
+      .rootNode()
+      ?.closest('[data-slot="dialog-content"]');
+    if (dialog) {
+      const onAnimationEnd = () => expandedCarouselApi.reInit();
+      dialog.addEventListener("animationend", onAnimationEnd, { once: true });
+      return () => dialog.removeEventListener("animationend", onAnimationEnd);
+    }
   }, [expandedCarouselApi]);
 
   // Keep thumbnail carousel in sync when currentIndex changes (e.g. from expanded view)
