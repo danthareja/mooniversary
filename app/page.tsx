@@ -19,11 +19,30 @@ export default function Home() {
     nextMooniversaryNumber,
   } = useMooniversary();
 
+  const swipeOriginRef = React.useRef<EventTarget | null>(null);
+
   const swipeHandlers = useSwipeable({
-    onSwipedLeft: () =>
-      setMooniversaryNumber(Math.min(999, mooniversaryNumber + 1)),
-    onSwipedRight: () =>
-      setMooniversaryNumber(Math.max(1, mooniversaryNumber - 1)),
+    onTouchStartOrOnMouseDown: ({ event }) => {
+      swipeOriginRef.current = event.target;
+    },
+    onSwipedLeft: () => {
+      if (
+        (swipeOriginRef.current as HTMLElement)?.closest(
+          '[data-slot="carousel"]',
+        )
+      )
+        return;
+      setMooniversaryNumber(Math.min(999, mooniversaryNumber + 1));
+    },
+    onSwipedRight: () => {
+      if (
+        (swipeOriginRef.current as HTMLElement)?.closest(
+          '[data-slot="carousel"]',
+        )
+      )
+        return;
+      setMooniversaryNumber(Math.max(1, mooniversaryNumber - 1));
+    },
     preventScrollOnSwipe: true,
   });
 
