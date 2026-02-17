@@ -59,15 +59,6 @@ export default function Home() {
             className="flex flex-col items-center space-y-6 py-4 px-4 w-full max-w-2xl"
             data-test="next-mooniversary"
           >
-            {/* Mobile swipe hint */}
-            <div className="sm:hidden flex items-center gap-2 pointer-events-none animate-fade-out">
-              <ChevronLeft className="h-5 w-5 text-white/40" />
-              <span className="text-white/50 text-sm font-semibold tracking-wide [text-shadow:_-1px_-1px_0_#000,_1px_-1px_0_#000,_-1px_1px_0_#000,_1px_1px_0_#000]">
-                Swipe to change dates
-              </span>
-              <ChevronRight className="h-5 w-5 text-white/40" />
-            </div>
-
             <div className="text-center mx-4 mb-6">
               <h1
                 className="m-0 leading-[1.15] text-[2.25rem] sm:text-[2.75rem] text-white/90 text-center font-black tracking-wider [text-shadow:_-3px_-3px_0_#000,_3px_-3px_0_#000,_-3px_3px_0_#000,_3px_3px_0_#000,_-2px_-2px_0_#000,_2px_-2px_0_#000,_-2px_2px_0_#000,_2px_2px_0_#000]"
