@@ -2,6 +2,7 @@
 
 import React from "react";
 import { useSwipeable } from "react-swipeable";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useMooniversary } from "@/hooks/mooniversary";
 import { Background } from "@/components/background";
 import { MoonSlider } from "@/components/moon-slider";
@@ -58,6 +59,15 @@ export default function Home() {
             className="flex flex-col items-center space-y-6 py-4 px-4 w-full max-w-2xl"
             data-test="next-mooniversary"
           >
+            {/* Mobile swipe hint */}
+            <div className="sm:hidden flex items-center gap-2 pointer-events-none animate-fade-out">
+              <ChevronLeft className="h-5 w-5 text-white/40" />
+              <span className="text-white/50 text-sm font-semibold tracking-wide [text-shadow:_-1px_-1px_0_#000,_1px_-1px_0_#000,_-1px_1px_0_#000,_1px_1px_0_#000]">
+                Swipe to change dates
+              </span>
+              <ChevronRight className="h-5 w-5 text-white/40" />
+            </div>
+
             <div className="text-center mx-4 mb-6">
               <h1
                 className="m-0 leading-[1.15] text-[2.25rem] sm:text-[2.75rem] text-white/90 text-center font-black tracking-wider [text-shadow:_-3px_-3px_0_#000,_3px_-3px_0_#000,_-3px_3px_0_#000,_3px_3px_0_#000,_-2px_-2px_0_#000,_2px_-2px_0_#000,_-2px_2px_0_#000,_2px_2px_0_#000]"
@@ -142,6 +152,40 @@ export default function Home() {
               nextMooniversaryNumber={nextMooniversaryNumber}
             />
           </main>
+
+          {/* Mobile edge chevrons */}
+          {mooniversaryNumber > 1 && (
+            <button
+              onClick={() =>
+                setMooniversaryNumber(Math.max(1, mooniversaryNumber - 1))
+              }
+              className="sm:hidden fixed left-2 top-1/2 -translate-y-1/2 z-10 text-white/30 active:text-white/60"
+              aria-label="Previous date"
+            >
+              <ChevronLeft className="h-6 w-6" />
+            </button>
+          )}
+          {mooniversaryNumber < 999 && (
+            <button
+              onClick={() =>
+                setMooniversaryNumber(Math.min(999, mooniversaryNumber + 1))
+              }
+              className="sm:hidden fixed right-2 top-1/2 -translate-y-1/2 z-10 text-white/30 active:text-white/60"
+              aria-label="Next date"
+            >
+              <ChevronRight className="h-6 w-6" />
+            </button>
+          )}
+
+          {/* Mobile "Now" button */}
+          {mooniversaryNumber !== nextMooniversaryNumber && (
+            <button
+              onClick={() => setMooniversaryNumber(nextMooniversaryNumber)}
+              className="sm:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-10 text-white/30 active:text-white/60 text-sm"
+            >
+              Now
+            </button>
+          )}
         </div>
       </MoonSlider>
     </>
