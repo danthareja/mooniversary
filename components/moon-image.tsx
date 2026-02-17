@@ -49,11 +49,7 @@ export function MoonImage({
   const [carouselApi, setCarouselApi] = React.useState<CarouselApi | undefined>(
     undefined,
   );
-  const [expandedCarouselApi, setExpandedCarouselApi] = React.useState<
-    CarouselApi | undefined
-  >(undefined);
-
-  // currentIndex is used to sync between thumbnail and expanded carousels
+  // currentIndex is used to sync between thumbnail and expanded view
 
   const isUploadAllowed = moonNumber <= nextMooniversaryNumber;
 
@@ -125,29 +121,24 @@ export function MoonImage({
     carouselApi.on("select", onSelect);
   }, [carouselApi]);
 
-  // Sync expanded carousel selection back to currentIndex
-  React.useEffect(() => {
-    if (!expandedCarouselApi) return;
-    const onSelect = () =>
-      setCurrentIndex(expandedCarouselApi.selectedScrollSnap());
-    expandedCarouselApi.on("select", onSelect);
-    // ReInit after dialog open animation completes so Embla measures correct dimensions
-    const dialog = expandedCarouselApi
-      .rootNode()
-      ?.closest('[data-slot="dialog-content"]');
-    if (dialog) {
-      const onAnimationEnd = () => expandedCarouselApi.reInit();
-      dialog.addEventListener("animationend", onAnimationEnd, { once: true });
-      return () => dialog.removeEventListener("animationend", onAnimationEnd);
-    }
-  }, [expandedCarouselApi]);
-
   // Keep thumbnail carousel in sync when currentIndex changes (e.g. from expanded view)
   React.useEffect(() => {
     if (carouselApi && carouselApi.selectedScrollSnap() !== currentIndex) {
       carouselApi.scrollTo(currentIndex);
     }
   }, [carouselApi, currentIndex]);
+
+  const scrollContainerRef = React.useRef<HTMLDivElement>(null);
+
+  // Scroll to the correct image when dialog opens or currentIndex changes externally
+  React.useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+    const targetScroll = currentIndex * container.clientWidth;
+    if (Math.abs(container.scrollLeft - targetScroll) > 1) {
+      container.scrollTo({ left: targetScroll, behavior: "instant" });
+    }
+  }, [currentIndex, images]);
 
   const handleImageError = () => {
     setIsImageLoading(false);
@@ -332,52 +323,72 @@ export function MoonImage({
                       Image for Moon {moonNumber}
                     </DialogDescription>
                     <div className="relative">
-                      <Carousel
-                        setApi={setExpandedCarouselApi}
-                        opts={{ startIndex: currentIndex }}
+                      <div
+                        ref={scrollContainerRef}
+                        className="flex overflow-x-auto hide-scrollbar"
+                        style={{
+                          scrollSnapType: "x mandatory",
+                          WebkitOverflowScrolling: "touch",
+                          scrollbarWidth: "none",
+                          msOverflowStyle: "none",
+                        }}
+                        onScroll={(e) => {
+                          const container = e.currentTarget;
+                          const newIndex = Math.round(
+                            container.scrollLeft / container.clientWidth,
+                          );
+                          if (
+                            newIndex !== currentIndex &&
+                            newIndex >= 0 &&
+                            newIndex < images.length
+                          ) {
+                            setCurrentIndex(newIndex);
+                          }
+                        }}
                       >
-                        <CarouselContent className="-ml-0">
-                          {images.map((id) => (
-                            <CarouselItem
-                              key={`expanded-${id}-${imageKey}`}
-                              className="pl-0"
-                            >
-                              <Image
-                                src={`/api/images/${moonNumber}?id=${id}&v=${imageKey}`}
-                                alt={`Moon ${moonNumber} full`}
-                                width={1200}
-                                height={1200}
-                                className="w-full h-auto object-contain rounded-lg"
-                                style={{
-                                  maxWidth: "100%",
-                                  height: "auto",
-                                }}
-                                unoptimized
-                                loading="eager"
-                              />
-                            </CarouselItem>
+                        {images.map((id) => (
+                          <div
+                            key={id}
+                            className="flex-none w-full flex items-center justify-center"
+                            style={{
+                              scrollSnapAlign: "center",
+                              minHeight: "50vh",
+                            }}
+                          >
+                            <Image
+                              src={`/api/images/${moonNumber}?id=${id}&v=${imageKey}`}
+                              alt={`Moon ${moonNumber} full`}
+                              width={1200}
+                              height={1200}
+                              className="max-w-full max-h-[80vh] w-auto h-auto object-contain rounded-lg"
+                              unoptimized
+                              loading="eager"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                      {images.length > 1 && (
+                        <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
+                          {images.map((_, idx) => (
+                            <button
+                              key={idx}
+                              type="button"
+                              aria-label={`Go to image ${idx + 1}`}
+                              onClick={() => {
+                                setCurrentIndex(idx);
+                                scrollContainerRef.current?.scrollTo({
+                                  left:
+                                    idx *
+                                    (scrollContainerRef.current?.clientWidth ??
+                                      0),
+                                  behavior: "smooth",
+                                });
+                              }}
+                              className={`h-2.5 w-2.5 rounded-full ${idx === currentIndex ? "bg-white" : "bg-white/50"} shadow-sm`}
+                            />
                           ))}
-                        </CarouselContent>
-                        {images.length > 1 && (
-                          <>
-                            <CarouselPrevious className="left-2 top-1/2 -translate-y-1/2" />
-                            <CarouselNext className="right-2 top-1/2 -translate-y-1/2" />
-                            <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
-                              {images.map((_, idx) => (
-                                <button
-                                  key={idx}
-                                  type="button"
-                                  aria-label={`Go to image ${idx + 1}`}
-                                  onClick={() =>
-                                    expandedCarouselApi?.scrollTo(idx)
-                                  }
-                                  className={`h-2.5 w-2.5 rounded-full ${idx === currentIndex ? "bg-white" : "bg-white/50"} shadow-sm`}
-                                />
-                              ))}
-                            </div>
-                          </>
-                        )}
-                      </Carousel>
+                        </div>
+                      )}
                       <DialogClose asChild>
                         <Button className="absolute top-4 right-4 size-8 rounded-full bg-white/80 hover:bg-white text-black shadow-none focus:outline-none focus:ring-0">
                           <X className="h-5 w-5" />
