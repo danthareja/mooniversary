@@ -228,6 +228,7 @@ export function MoonImage({
 
   React.useEffect(() => {
     resetUpload();
+    setCurrentIndex(0);
   }, [moonNumber]);
 
   return (
